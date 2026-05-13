@@ -27,8 +27,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['icon.svg', 'icons/*.png'],
       manifest: {
-        name: 'Kairo',
-        short_name: 'Kairo',
+        name: 'Lucid',
+        short_name: 'Lucid',
         description: 'Track meals, sleep, and brain fog to find patterns.',
         theme_color: '#0f172a',
         background_color: '#0f172a',

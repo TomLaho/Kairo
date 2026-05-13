@@ -14,7 +14,7 @@ const TABS: { id: Tab; label: string }[] = [
 ]
 
 function useCorrelationWindow(): CorrelationWindow {
-  const stored = localStorage.getItem('kairo:correlationWindow')
+  const stored = localStorage.getItem('lucid:correlationWindow')
   return (stored ? parseInt(stored) : DEFAULT_CORRELATION_WINDOW) as CorrelationWindow
 }
 

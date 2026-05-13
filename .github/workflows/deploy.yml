@@ -1,6 +1,10 @@
 name: Deploy to GitHub Pages
 
 on:
+  push:
+    branches:
+      - main
+      - claude/health-tracker-plan-1vkzB
   workflow_dispatch:
 
 permissions:

@@ -8,11 +8,11 @@ import { ConfirmModal } from '../components/ConfirmModal'
 
 function useStoredWindow(): [CorrelationWindow, (w: CorrelationWindow) => void] {
   const [value, setValue] = useState<CorrelationWindow>(() => {
-    const stored = localStorage.getItem('kairo:correlationWindow')
+    const stored = localStorage.getItem('lucid:correlationWindow')
     return (stored ? parseInt(stored) : DEFAULT_CORRELATION_WINDOW) as CorrelationWindow
   })
   function set(w: CorrelationWindow) {
-    localStorage.setItem('kairo:correlationWindow', String(w))
+    localStorage.setItem('lucid:correlationWindow', String(w))
     setValue(w)
   }
   return [value, set]
@@ -114,7 +114,7 @@ export function SettingsScreen() {
           </button>
         </div>
 
-        <p className="text-center text-xs text-slate-600 pt-2">Kairo v0.1.0</p>
+        <p className="text-center text-xs text-slate-600 pt-2">Lucid v0.1.0</p>
       </div>
 
       <ConfirmModal

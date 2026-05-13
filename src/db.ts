@@ -64,18 +64,18 @@ export const TAG_LABELS: Record<MealTag | 'untagged', string> = {
   untagged: 'No tag',
 }
 
-class KairoDB extends Dexie {
+class LucidDB extends Dexie {
   entries!: Table<Entry>
 
   constructor() {
-    super('kairo')
+    super('lucid')
     this.version(1).stores({
       entries: 'id, type, timestamp, created_at, bedtime, wake_time',
     })
   }
 }
 
-export const db = new KairoDB()
+export const db = new LucidDB()
 
 export function newId(): string {
   return crypto.randomUUID()

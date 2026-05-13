@@ -33,7 +33,7 @@ export function exportMeals(meals: MealEntry[]): void {
     m.tags.join('|'),
     String(m.fasted_period_before ?? ''),
   ])
-  downloadCsv('kairo-meals.csv', rows(headers, data))
+  downloadCsv('lucid-meals.csv', rows(headers, data))
 }
 
 export function exportSleep(entries: SleepEntry[]): void {
@@ -46,11 +46,11 @@ export function exportSleep(entries: SleepEntry[]): void {
     String(s.wakeups),
     String(s.body_battery ?? ''),
   ])
-  downloadCsv('kairo-sleep.csv', rows(headers, data))
+  downloadCsv('lucid-sleep.csv', rows(headers, data))
 }
 
 export function exportBrainFog(entries: BrainFogEntry[]): void {
   const headers = ['id', 'timestamp', 'score', 'note']
   const data = entries.map(f => [f.id, f.timestamp, String(f.score), f.note ?? ''])
-  downloadCsv('kairo-brain-fog.csv', rows(headers, data))
+  downloadCsv('lucid-brain-fog.csv', rows(headers, data))
 }
