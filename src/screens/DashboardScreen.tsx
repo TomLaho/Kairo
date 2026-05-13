@@ -138,3 +138,5 @@ export function DashboardScreen() {
     </div>
   )
 }
+
+export default DashboardScreen
