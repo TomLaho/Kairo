@@ -1,4 +1,4 @@
-import type { Entry, MealEntry, SleepEntry, BrainFogEntry } from '../db'
+import type { Entry, MealEntry, SleepEntry, BrainFogEntry, WaterEntry } from '../db'
 import { MEAL_TAGS, TAG_COLORS } from '../db'
 import { relativeTime, formatDuration, sleepDurationHours } from '../utils/time'
 
@@ -113,8 +113,38 @@ function FogCard({ entry, onEdit, onDelete }: { entry: BrainFogEntry } & Omit<Pr
   )
 }
 
+function WaterCard({ entry, onEdit, onDelete }: { entry: WaterEntry } & Omit<Props, 'entry'>) {
+  const displayAmount = entry.amount_ml >= 1000
+    ? `${(entry.amount_ml / 1000).toFixed(entry.amount_ml % 1000 === 0 ? 0 : 1)} L`
+    : `${entry.amount_ml} ml`
+  return (
+    <button
+      className="w-full text-left bg-slate-700/50 rounded-xl p-4 active:bg-slate-700 transition-colors"
+      onClick={() => onEdit(entry)}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-xs font-semibold uppercase tracking-wide text-cyan-400">Water</span>
+            <span className="text-xs text-slate-500">{relativeTime(entry.timestamp)}</span>
+          </div>
+          <div className="text-slate-200 text-sm font-medium">💧 {displayAmount}</div>
+        </div>
+        <button
+          onClick={e => { e.stopPropagation(); onDelete(entry.id) }}
+          className="text-slate-600 hover:text-red-400 transition-colors p-1 flex-shrink-0"
+          aria-label="Delete"
+        >
+          🗑
+        </button>
+      </div>
+    </button>
+  )
+}
+
 export function EntryCard({ entry, onEdit, onDelete }: Props) {
   if (entry.type === 'meal') return <MealCard entry={entry} onEdit={onEdit} onDelete={onDelete} />
   if (entry.type === 'sleep') return <SleepCard entry={entry} onEdit={onEdit} onDelete={onDelete} />
+  if (entry.type === 'water') return <WaterCard entry={entry} onEdit={onEdit} onDelete={onDelete} />
   return <FogCard entry={entry} onEdit={onEdit} onDelete={onDelete} />
 }

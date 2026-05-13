@@ -2,8 +2,9 @@ import { useState } from 'react'
 import { MealSheet } from '../sheets/MealSheet'
 import { BrainFogSheet } from '../sheets/BrainFogSheet'
 import { SleepSheet } from '../sheets/SleepSheet'
+import { WaterSheet } from '../sheets/WaterSheet'
 
-type SheetType = 'meal' | 'brain_fog' | 'sleep' | null
+type SheetType = 'meal' | 'brain_fog' | 'sleep' | 'water' | null
 
 const ENTRY_CARDS = [
   {
@@ -29,6 +30,14 @@ const ENTRY_CARDS = [
     sub: 'Last night\'s sleep',
     color: 'from-blue-600/20 to-blue-600/5 border-blue-500/30',
     iconBg: 'bg-blue-600/30',
+  },
+  {
+    type: 'water' as SheetType,
+    icon: '💧',
+    label: 'Log Water',
+    sub: 'Track your hydration',
+    color: 'from-cyan-600/20 to-cyan-600/5 border-cyan-500/30',
+    iconBg: 'bg-cyan-600/30',
   },
 ]
 
@@ -58,6 +67,7 @@ export function LogScreen() {
       <MealSheet isOpen={open === 'meal'} onClose={() => setOpen(null)} />
       <BrainFogSheet isOpen={open === 'brain_fog'} onClose={() => setOpen(null)} />
       <SleepSheet isOpen={open === 'sleep'} onClose={() => setOpen(null)} />
+      <WaterSheet isOpen={open === 'water'} onClose={() => setOpen(null)} />
     </div>
   )
 }

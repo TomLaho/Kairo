@@ -42,7 +42,15 @@ export interface BrainFogEntry {
   created_at: string
 }
 
-export type Entry = MealEntry | SleepEntry | BrainFogEntry
+export interface WaterEntry {
+  id: string
+  type: 'water'
+  timestamp: string
+  amount_ml: number
+  created_at: string
+}
+
+export type Entry = MealEntry | SleepEntry | BrainFogEntry | WaterEntry
 
 export const CORRELATION_WINDOW_OPTIONS = [6, 8, 12, 16] as const
 export type CorrelationWindow = (typeof CORRELATION_WINDOW_OPTIONS)[number]
