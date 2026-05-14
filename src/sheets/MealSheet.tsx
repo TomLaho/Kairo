@@ -76,8 +76,12 @@ export function MealSheet({ isOpen, onClose, editEntry }: Props) {
 
     if (willAutoTag) {
       analyzeWithGemini(description.trim(), apiKey)
-        .then(tags => saveMeal({ ...entry, tags, tagsStatus: 'done' }))
-        .catch(() => saveMeal({ ...entry, tagsStatus: 'failed' }))
+        .then(tags => saveMeal({ ...entry, tags, tagsStatus: 'done', tagsError: undefined }))
+        .catch((e: unknown) => saveMeal({
+          ...entry,
+          tagsStatus: 'failed',
+          tagsError: e instanceof Error ? e.message : 'Unknown error',
+        }))
     }
   }
 
@@ -85,10 +89,14 @@ export function MealSheet({ isOpen, onClose, editEntry }: Props) {
     if (!editEntry) return
     const apiKey = getGeminiKey()
     if (!apiKey) return
-    await saveMeal({ ...editEntry, tagsStatus: 'pending' })
+    await saveMeal({ ...editEntry, tagsStatus: 'pending', tagsError: undefined })
     analyzeWithGemini(editEntry.description, apiKey)
-      .then(tags => saveMeal({ ...editEntry, tags, tagsStatus: 'done' }))
-      .catch(() => saveMeal({ ...editEntry, tagsStatus: 'failed' }))
+      .then(tags => saveMeal({ ...editEntry, tags, tagsStatus: 'done', tagsError: undefined }))
+      .catch((e: unknown) => saveMeal({
+        ...editEntry,
+        tagsStatus: 'failed',
+        tagsError: e instanceof Error ? e.message : 'Unknown error',
+      }))
     onClose()
   }
 

@@ -50,7 +50,14 @@ export async function analyzeWithGemini(
     }),
   })
 
-  if (!res.ok) throw new Error(`Gemini API ${res.status}`)
+  if (!res.ok) {
+    let msg = `HTTP ${res.status}`
+    try {
+      const body = await res.json() as { error?: { message?: string } }
+      if (body.error?.message) msg = body.error.message
+    } catch { /* ignore parse error */ }
+    throw new Error(msg)
+  }
 
   const data = await res.json() as {
     candidates?: { content?: { parts?: { text?: string }[] } }[]

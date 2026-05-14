@@ -31,16 +31,35 @@ export function SettingsScreen() {
 
   const [reanalyzing, setReanalyzing] = useState(false)
   const [reanalyzeProgress, setReanalyzeProgress] = useState<{ done: number; total: number } | null>(null)
+  const [reanalyzeError, setReanalyzeError] = useState('')
+  const [testStatus, setTestStatus] = useState<'idle' | 'testing' | 'ok' | 'error'>('idle')
+  const [testError, setTestError] = useState('')
 
   function handleSaveGeminiKey() {
     setGeminiKey(geminiKey)
     setGeminiSaved(true)
+    setTestStatus('idle')
     setTimeout(() => setGeminiSaved(false), 2000)
   }
 
   function handleClearGeminiKey() {
     setGeminiKey('')
     setGeminiKeyState('')
+    setTestStatus('idle')
+  }
+
+  async function handleTestKey() {
+    const apiKey = getGeminiKey()
+    if (!apiKey) return
+    setTestStatus('testing')
+    setTestError('')
+    try {
+      await analyzeWithGemini('grilled chicken with white rice', apiKey)
+      setTestStatus('ok')
+    } catch (e) {
+      setTestError(e instanceof Error ? e.message : 'Unknown error')
+      setTestStatus('error')
+    }
   }
 
   async function handleReanalyzeMeals() {
@@ -63,6 +82,10 @@ export function SettingsScreen() {
     }
     setReanalyzing(false)
     setReanalyzeProgress(null)
+    // Check if any failed
+    const failedMeals = (await db.entries.where('type').equals('meal').toArray()) as MealEntry[]
+    const firstFailed = failedMeals.find(m => m.tagsStatus === 'failed')
+    if (firstFailed?.tagsError) setReanalyzeError(firstFailed.tagsError)
   }
 
   async function handleClearAll() {
@@ -126,22 +149,44 @@ export function SettingsScreen() {
             </button>
           </div>
           {geminiKey && (
-            <div className="mt-3 flex items-center justify-between gap-3">
+            <div className="mt-3 space-y-2">
+              {/* Test key */}
               <button
-                onClick={handleReanalyzeMeals}
-                disabled={reanalyzing || meals.length === 0}
-                className="flex-1 py-2.5 bg-slate-700 hover:bg-slate-600 active:bg-slate-500 disabled:opacity-40 disabled:cursor-not-allowed text-slate-200 text-sm font-medium rounded-xl transition-colors"
+                onClick={handleTestKey}
+                disabled={testStatus === 'testing'}
+                className="w-full py-2.5 bg-slate-700 hover:bg-slate-600 disabled:opacity-40 text-slate-200 text-sm font-medium rounded-xl transition-colors"
               >
-                {reanalyzing && reanalyzeProgress
-                  ? `Analyzing… ${reanalyzeProgress.done}/${reanalyzeProgress.total}`
-                  : `Re-analyze all ${meals.length} meal${meals.length !== 1 ? 's' : ''}`}
+                {testStatus === 'testing' ? 'Testing…' : testStatus === 'ok' ? '✓ Connected — key works' : testStatus === 'error' ? '✕ Test failed — see error below' : 'Test API key'}
               </button>
-              <button
-                onClick={handleClearGeminiKey}
-                className="text-xs text-slate-500 hover:text-red-400 transition-colors px-2 py-1"
-              >
-                Clear key
-              </button>
+              {testStatus === 'error' && testError && (
+                <p className="text-xs text-red-400 bg-red-900/20 rounded-xl px-3 py-2 break-words">{testError}</p>
+              )}
+              {testStatus === 'ok' && (
+                <p className="text-xs text-emerald-400">Gemini responded correctly. Re-analyze your meals below.</p>
+              )}
+              {/* Re-analyze */}
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={handleReanalyzeMeals}
+                  disabled={reanalyzing || meals.length === 0}
+                  className="flex-1 py-2.5 bg-slate-700 hover:bg-slate-600 active:bg-slate-500 disabled:opacity-40 disabled:cursor-not-allowed text-slate-200 text-sm font-medium rounded-xl transition-colors"
+                >
+                  {reanalyzing && reanalyzeProgress
+                    ? `Analyzing… ${reanalyzeProgress.done}/${reanalyzeProgress.total}`
+                    : `Re-analyze all ${meals.length} meal${meals.length !== 1 ? 's' : ''}`}
+                </button>
+                <button
+                  onClick={handleClearGeminiKey}
+                  className="text-xs text-slate-500 hover:text-red-400 transition-colors px-2 py-1"
+                >
+                  Clear key
+                </button>
+              </div>
+              {reanalyzeError && (
+                <p className="text-xs text-red-400 bg-red-900/20 rounded-xl px-3 py-2 break-words">
+                  Last error: {reanalyzeError}
+                </p>
+              )}
             </div>
           )}
         </div>

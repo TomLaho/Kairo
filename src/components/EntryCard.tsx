@@ -43,8 +43,8 @@ function MealCard({ entry, onEdit, onDelete }: { entry: MealEntry } & Omit<Props
               </span>
             )}
             {tagsStatus === 'failed' && (
-              <span className="text-xs px-2 py-0.5 rounded-full bg-red-900/40 text-red-400">
-                AI failed · tap to retry
+              <span className="text-xs px-2 py-0.5 rounded-full bg-red-900/40 text-red-400 max-w-full truncate">
+                {entry.tagsError ? `AI: ${entry.tagsError}` : 'AI failed · tap to retry'}
               </span>
             )}
           </div>

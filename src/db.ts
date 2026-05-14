@@ -20,6 +20,7 @@ export interface MealEntry {
   description: string
   tags: MealTag[]
   tagsStatus?: 'pending' | 'done' | 'failed'
+  tagsError?: string
   fasted_period_before?: number
   created_at: string
 }
