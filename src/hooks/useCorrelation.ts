@@ -11,6 +11,14 @@ export interface CorrelationGroup {
   points: { x: number; y: number; fogId: string; mealId: string }[]
 }
 
+export interface TagFogAverage {
+  tag: DominantTag
+  color: string
+  label: string
+  avgFog: number
+  count: number
+}
+
 export function useCorrelation(windowHours: number): CorrelationGroup[] {
   const meals = useMealsAsc()
   const fogEntries = useBrainFogAsc()
@@ -32,4 +40,21 @@ export function useCorrelation(windowHours: number): CorrelationGroup[] {
       points: pts.map(p => ({ x: p.timeSinceMealHours, y: p.fogScore, fogId: p.fogId, mealId: p.mealId })),
     }))
   }, [fogEntries, meals, windowHours])
+}
+
+export function useTagFogAverages(windowHours: number): TagFogAverage[] {
+  const groups = useCorrelation(windowHours)
+  return useMemo(() => {
+    return groups
+      .map(g => ({
+        tag: g.tag,
+        color: g.color,
+        label: g.label,
+        avgFog: g.points.length > 0
+          ? Math.round((g.points.reduce((s, p) => s + p.y, 0) / g.points.length) * 10) / 10
+          : 0,
+        count: g.points.length,
+      }))
+      .sort((a, b) => b.avgFog - a.avgFog)
+  }, [groups])
 }

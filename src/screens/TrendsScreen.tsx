@@ -3,6 +3,7 @@ import { FogLineChart } from '../charts/FogLineChart'
 import { CorrelationScatter } from '../charts/CorrelationScatter'
 import { SleepBarChart } from '../charts/SleepBarChart'
 import { MealTagsChart } from '../charts/MealTagsChart'
+import { TagFogAverageChart } from '../charts/TagFogAverageChart'
 import { DEFAULT_CORRELATION_WINDOW, type CorrelationWindow } from '../db'
 
 type Tab = 'fog' | 'sleep' | 'meals'
@@ -78,14 +79,27 @@ export function TrendsScreen() {
         )}
 
         {tab === 'meals' && (
-          <div>
-            <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wide mb-3">
-              Tag frequency
-            </h2>
-            <div className="bg-slate-800 rounded-2xl p-3">
-              <MealTagsChart />
+          <>
+            <div>
+              <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wide mb-1">
+                Avg brain fog by tag
+              </h2>
+              <p className="text-xs text-slate-500 mb-3">
+                Mean fog score for episodes logged within {windowHours}h of a meal with that tag
+              </p>
+              <div className="bg-slate-800 rounded-2xl p-3">
+                <TagFogAverageChart windowHours={windowHours} />
+              </div>
             </div>
-          </div>
+            <div>
+              <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wide mb-3">
+                Tag frequency
+              </h2>
+              <div className="bg-slate-800 rounded-2xl p-3">
+                <MealTagsChart />
+              </div>
+            </div>
+          </>
         )}
       </div>
     </div>

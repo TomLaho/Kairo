@@ -1,11 +1,12 @@
 import { useState } from 'react'
-import { db, CORRELATION_WINDOW_OPTIONS, DEFAULT_CORRELATION_WINDOW, type CorrelationWindow } from '../db'
+import { db, CORRELATION_WINDOW_OPTIONS, DEFAULT_CORRELATION_WINDOW, type CorrelationWindow, type MealEntry } from '../db'
 import { useMeals } from '../hooks/useMeals'
 import { useSleep } from '../hooks/useSleep'
 import { useBrainFog } from '../hooks/useBrainFog'
+import { saveMeal } from '../hooks/useMeals'
 import { exportMeals, exportSleep, exportBrainFog } from '../utils/export'
 import { ConfirmModal } from '../components/ConfirmModal'
-import { getGeminiKey, setGeminiKey } from '../utils/gemini'
+import { getGeminiKey, setGeminiKey, analyzeWithGemini } from '../utils/gemini'
 
 function useStoredWindow(): [CorrelationWindow, (w: CorrelationWindow) => void] {
   const [value, setValue] = useState<CorrelationWindow>(() => {
@@ -28,6 +29,9 @@ export function SettingsScreen() {
   const sleep = useSleep()
   const fog = useBrainFog()
 
+  const [reanalyzing, setReanalyzing] = useState(false)
+  const [reanalyzeProgress, setReanalyzeProgress] = useState<{ done: number; total: number } | null>(null)
+
   function handleSaveGeminiKey() {
     setGeminiKey(geminiKey)
     setGeminiSaved(true)
@@ -37,6 +41,24 @@ export function SettingsScreen() {
   function handleClearGeminiKey() {
     setGeminiKey('')
     setGeminiKeyState('')
+  }
+
+  async function handleReanalyzeMeals() {
+    const apiKey = getGeminiKey()
+    if (!apiKey || reanalyzing) return
+    setReanalyzing(true)
+    const allMeals = (await db.entries.where('type').equals('meal').toArray()) as MealEntry[]
+    setReanalyzeProgress({ done: 0, total: allMeals.length })
+    for (let i = 0; i < allMeals.length; i++) {
+      try {
+        const tags = await analyzeWithGemini(allMeals[i].description, apiKey)
+        await saveMeal({ ...allMeals[i], tags })
+      } catch { /* skip on error */ }
+      setReanalyzeProgress({ done: i + 1, total: allMeals.length })
+      if (i < allMeals.length - 1) await new Promise(r => setTimeout(r, 250))
+    }
+    setReanalyzing(false)
+    setReanalyzeProgress(null)
   }
 
   async function handleClearAll() {
@@ -100,12 +122,23 @@ export function SettingsScreen() {
             </button>
           </div>
           {geminiKey && (
-            <button
-              onClick={handleClearGeminiKey}
-              className="mt-2 text-xs text-slate-500 hover:text-red-400 transition-colors"
-            >
-              Clear key
-            </button>
+            <div className="mt-3 flex items-center justify-between gap-3">
+              <button
+                onClick={handleReanalyzeMeals}
+                disabled={reanalyzing || meals.length === 0}
+                className="flex-1 py-2.5 bg-slate-700 hover:bg-slate-600 active:bg-slate-500 disabled:opacity-40 disabled:cursor-not-allowed text-slate-200 text-sm font-medium rounded-xl transition-colors"
+              >
+                {reanalyzing && reanalyzeProgress
+                  ? `Analyzing… ${reanalyzeProgress.done}/${reanalyzeProgress.total}`
+                  : `Re-analyze all ${meals.length} meal${meals.length !== 1 ? 's' : ''}`}
+              </button>
+              <button
+                onClick={handleClearGeminiKey}
+                className="text-xs text-slate-500 hover:text-red-400 transition-colors px-2 py-1"
+              >
+                Clear key
+              </button>
+            </div>
           )}
         </div>
 
