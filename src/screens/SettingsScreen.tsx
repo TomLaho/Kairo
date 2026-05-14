@@ -6,7 +6,7 @@ import { useBrainFog } from '../hooks/useBrainFog'
 import { saveMeal } from '../hooks/useMeals'
 import { exportMeals, exportSleep, exportBrainFog } from '../utils/export'
 import { ConfirmModal } from '../components/ConfirmModal'
-import { getGeminiKey, setGeminiKey, analyzeWithGemini } from '../utils/gemini'
+import { getAIKey, setAIKey, getAIProvider, setAIProvider, analyzeWithAI, type AIProvider } from '../utils/ai'
 
 function useStoredWindow(): [CorrelationWindow, (w: CorrelationWindow) => void] {
   const [value, setValue] = useState<CorrelationWindow>(() => {
@@ -23,8 +23,9 @@ function useStoredWindow(): [CorrelationWindow, (w: CorrelationWindow) => void] 
 export function SettingsScreen() {
   const [confirmClear, setConfirmClear] = useState(false)
   const [windowHours, setWindowHours] = useStoredWindow()
-  const [geminiKey, setGeminiKeyState] = useState(() => getGeminiKey())
-  const [geminiSaved, setGeminiSaved] = useState(false)
+  const [aiKey, setAIKeyState] = useState(() => getAIKey())
+  const [aiProvider, setAIProviderState] = useState<AIProvider>(() => getAIProvider())
+  const [keySaved, setKeySaved] = useState(false)
   const meals = useMeals()
   const sleep = useSleep()
   const fog = useBrainFog()
@@ -35,26 +36,33 @@ export function SettingsScreen() {
   const [testStatus, setTestStatus] = useState<'idle' | 'testing' | 'ok' | 'error'>('idle')
   const [testError, setTestError] = useState('')
 
-  function handleSaveGeminiKey() {
-    setGeminiKey(geminiKey)
-    setGeminiSaved(true)
+  function handleSaveKey() {
+    setAIKey(aiKey)
+    setAIProvider(aiProvider)
+    setKeySaved(true)
     setTestStatus('idle')
-    setTimeout(() => setGeminiSaved(false), 2000)
+    setTimeout(() => setKeySaved(false), 2000)
   }
 
-  function handleClearGeminiKey() {
-    setGeminiKey('')
-    setGeminiKeyState('')
+  function handleClearKey() {
+    setAIKey('')
+    setAIKeyState('')
+    setTestStatus('idle')
+  }
+
+  function handleProviderChange(p: AIProvider) {
+    setAIProviderState(p)
+    setAIProvider(p)
     setTestStatus('idle')
   }
 
   async function handleTestKey() {
-    const apiKey = getGeminiKey()
+    const apiKey = getAIKey()
     if (!apiKey) return
     setTestStatus('testing')
     setTestError('')
     try {
-      await analyzeWithGemini('grilled chicken with white rice', apiKey)
+      await analyzeWithAI('grilled chicken with white rice')
       setTestStatus('ok')
     } catch (e) {
       setTestError(e instanceof Error ? e.message : 'Unknown error')
@@ -72,10 +80,10 @@ export function SettingsScreen() {
     setReanalyzeProgress({ done: 0, total: allMeals.length })
     for (let i = 0; i < allMeals.length; i++) {
       try {
-        const tags = await analyzeWithGemini(allMeals[i].description, apiKey)
+        const tags = await analyzeWithAI(allMeals[i].description)
         await saveMeal({ ...allMeals[i], tags, tagsStatus: 'done' })
-      } catch {
-        await saveMeal({ ...allMeals[i], tagsStatus: 'failed' })
+      } catch (e) {
+        await saveMeal({ ...allMeals[i], tagsStatus: 'failed', tagsError: e instanceof Error ? e.message : 'Unknown error' })
       }
       setReanalyzeProgress({ done: i + 1, total: allMeals.length })
       if (i < allMeals.length - 1) await new Promise(r => setTimeout(r, 250))
@@ -127,30 +135,44 @@ export function SettingsScreen() {
           </div>
         </div>
 
-        {/* Gemini API key */}
+        {/* AI provider + key */}
         <div className="bg-slate-800 rounded-2xl p-4">
-          <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-1">Gemini AI (meal tagging)</h2>
-          <p className="text-xs text-slate-500 mb-3">
-            Stays on this device only — never sent to GitHub or any server other than Google.
-          </p>
+          <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-1">AI meal tagging</h2>
+          <p className="text-xs text-slate-500 mb-3">Key stays on this device only — never sent to GitHub.</p>
+
+          {/* Provider toggle */}
+          <div className="flex bg-slate-700 rounded-xl p-1 gap-1 mb-3">
+            {(['gemini', 'xai'] as AIProvider[]).map(p => (
+              <button
+                key={p}
+                onClick={() => handleProviderChange(p)}
+                className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${
+                  aiProvider === p ? 'bg-slate-600 text-slate-100 shadow' : 'text-slate-500 hover:text-slate-300'
+                }`}
+              >
+                {p === 'gemini' ? 'Gemini 2.0' : 'xAI Grok'}
+              </button>
+            ))}
+          </div>
+
           <div className="flex gap-2">
             <input
               type="password"
-              value={geminiKey}
-              onChange={e => { setGeminiKeyState(e.target.value); setGeminiSaved(false) }}
-              placeholder="AIza…"
+              value={aiKey}
+              onChange={e => { setAIKeyState(e.target.value); setKeySaved(false) }}
+              placeholder={aiProvider === 'gemini' ? 'AIza…' : 'xai-…'}
               className="flex-1 bg-slate-700 rounded-xl px-4 py-3 text-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono"
             />
             <button
-              onClick={handleSaveGeminiKey}
+              onClick={handleSaveKey}
               className="px-4 py-3 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white text-sm font-semibold rounded-xl transition-colors whitespace-nowrap min-h-[44px]"
             >
-              {geminiSaved ? 'Saved ✓' : 'Save'}
+              {keySaved ? 'Saved ✓' : 'Save'}
             </button>
           </div>
-          {geminiKey && (
+
+          {aiKey && (
             <div className="mt-3 space-y-2">
-              {/* Test key */}
               <button
                 onClick={handleTestKey}
                 disabled={testStatus === 'testing'}
@@ -162,9 +184,8 @@ export function SettingsScreen() {
                 <p className="text-xs text-red-400 bg-red-900/20 rounded-xl px-3 py-2 break-words">{testError}</p>
               )}
               {testStatus === 'ok' && (
-                <p className="text-xs text-emerald-400">Gemini responded correctly. Re-analyze your meals below.</p>
+                <p className="text-xs text-emerald-400">Connected. Re-analyze your meals below.</p>
               )}
-              {/* Re-analyze */}
               <div className="flex items-center gap-3">
                 <button
                   onClick={handleReanalyzeMeals}
@@ -176,7 +197,7 @@ export function SettingsScreen() {
                     : `Re-analyze all ${meals.length} meal${meals.length !== 1 ? 's' : ''}`}
                 </button>
                 <button
-                  onClick={handleClearGeminiKey}
+                  onClick={handleClearKey}
                   className="text-xs text-slate-500 hover:text-red-400 transition-colors px-2 py-1"
                 >
                   Clear key

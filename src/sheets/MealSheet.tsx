@@ -4,7 +4,7 @@ import { saveMeal } from '../hooks/useMeals'
 import { useMeals } from '../hooks/useMeals'
 import { newId, nowIso, MEAL_TAGS, TAG_COLORS, type MealEntry } from '../db'
 import { toDatetimeLocal, fromDatetimeLocal, hoursBetween } from '../utils/time'
-import { analyzeWithGemini, getGeminiKey } from '../utils/gemini'
+import { analyzeWithAI, getAIKey } from '../utils/ai'
 
 interface Props {
   isOpen: boolean
@@ -59,7 +59,7 @@ export function MealSheet({ isOpen, onClose, editEntry }: Props) {
       setError('Description is required')
       return
     }
-    const apiKey = getGeminiKey()
+    const apiKey = getAIKey()
     const willAutoTag = !editEntry && !!apiKey
     const entry: MealEntry = {
       id: editEntry?.id ?? newId(),
@@ -75,7 +75,7 @@ export function MealSheet({ isOpen, onClose, editEntry }: Props) {
     onClose()
 
     if (willAutoTag) {
-      analyzeWithGemini(description.trim(), apiKey)
+      analyzeWithAI(description.trim())
         .then(tags => saveMeal({ ...entry, tags, tagsStatus: 'done', tagsError: undefined }))
         .catch((e: unknown) => saveMeal({
           ...entry,
@@ -87,10 +87,9 @@ export function MealSheet({ isOpen, onClose, editEntry }: Props) {
 
   async function handleReanalyze() {
     if (!editEntry) return
-    const apiKey = getGeminiKey()
-    if (!apiKey) return
+    if (!getAIKey()) return
     await saveMeal({ ...editEntry, tagsStatus: 'pending', tagsError: undefined })
-    analyzeWithGemini(editEntry.description, apiKey)
+    analyzeWithAI(editEntry.description)
       .then(tags => saveMeal({ ...editEntry, tags, tagsStatus: 'done', tagsError: undefined }))
       .catch((e: unknown) => saveMeal({
         ...editEntry,
@@ -185,7 +184,7 @@ export function MealSheet({ isOpen, onClose, editEntry }: Props) {
         </button>
 
         {/* Re-analyze (edit mode only, requires API key) */}
-        {editEntry && getGeminiKey() && (
+        {editEntry && getAIKey() && (
           <button
             type="button"
             onClick={handleReanalyze}
