@@ -59,26 +59,25 @@ export function MealSheet({ isOpen, onClose, editEntry }: Props) {
       setError('Description is required')
       return
     }
+    const apiKey = getGeminiKey()
+    const willAutoTag = !editEntry && !!apiKey
     const entry: MealEntry = {
       id: editEntry?.id ?? newId(),
       type: 'meal',
       timestamp: fromDatetimeLocal(timestamp),
       description: description.trim(),
       tags: editEntry?.tags ?? [],
+      tagsStatus: willAutoTag ? 'pending' : editEntry?.tagsStatus,
       fasted_period_before: fastedHours !== '' ? parseFloat(fastedHours) : undefined,
       created_at: editEntry?.created_at ?? nowIso(),
     }
     await saveMeal(entry)
     onClose()
 
-    // Auto-tag in background if adding a new entry and API key is set
-    if (!editEntry) {
-      const apiKey = getGeminiKey()
-      if (apiKey) {
-        analyzeWithGemini(description.trim(), apiKey)
-          .then(tags => saveMeal({ ...entry, tags }))
-          .catch(() => {/* silent fail — tags stay empty */})
-      }
+    if (willAutoTag) {
+      analyzeWithGemini(description.trim(), apiKey)
+        .then(tags => saveMeal({ ...entry, tags, tagsStatus: 'done' }))
+        .catch(() => saveMeal({ ...entry, tagsStatus: 'failed' }))
     }
   }
 
@@ -86,9 +85,10 @@ export function MealSheet({ isOpen, onClose, editEntry }: Props) {
     if (!editEntry) return
     const apiKey = getGeminiKey()
     if (!apiKey) return
+    await saveMeal({ ...editEntry, tagsStatus: 'pending' })
     analyzeWithGemini(editEntry.description, apiKey)
-      .then(tags => saveMeal({ ...editEntry, tags }))
-      .catch(() => {})
+      .then(tags => saveMeal({ ...editEntry, tags, tagsStatus: 'done' }))
+      .catch(() => saveMeal({ ...editEntry, tagsStatus: 'failed' }))
     onClose()
   }
 

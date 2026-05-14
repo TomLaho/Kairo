@@ -14,6 +14,7 @@ for (let i = 0; i <= 10; i++) {
 }
 
 function MealCard({ entry, onEdit, onDelete }: { entry: MealEntry } & Omit<Props, 'entry'>) {
+  const { tagsStatus, tags } = entry
   return (
     <button
       className="w-full text-left bg-slate-700/50 rounded-xl p-4 active:bg-slate-700 transition-colors"
@@ -26,19 +27,27 @@ function MealCard({ entry, onEdit, onDelete }: { entry: MealEntry } & Omit<Props
             <span className="text-xs text-slate-500">{relativeTime(entry.timestamp)}</span>
           </div>
           <p className="text-slate-200 text-sm truncate">{entry.description}</p>
-          {entry.tags.length > 0 && (
-            <div className="flex flex-wrap gap-1 mt-2">
-              {entry.tags.map(tag => (
-                <span
-                  key={tag}
-                  className="text-xs px-2 py-0.5 rounded-full font-medium"
-                  style={{ background: TAG_COLORS[tag] + '33', color: TAG_COLORS[tag] }}
-                >
-                  {MEAL_TAGS.find(t => t.value === tag)?.label}
-                </span>
-              ))}
-            </div>
-          )}
+          <div className="flex flex-wrap gap-1 mt-2">
+            {tags.map(tag => (
+              <span
+                key={tag}
+                className="text-xs px-2 py-0.5 rounded-full font-medium"
+                style={{ background: TAG_COLORS[tag] + '33', color: TAG_COLORS[tag] }}
+              >
+                {MEAL_TAGS.find(t => t.value === tag)?.label}
+              </span>
+            ))}
+            {tagsStatus === 'pending' && tags.length === 0 && (
+              <span className="text-xs px-2 py-0.5 rounded-full bg-slate-600/60 text-slate-400 animate-pulse">
+                AI analyzing…
+              </span>
+            )}
+            {tagsStatus === 'failed' && (
+              <span className="text-xs px-2 py-0.5 rounded-full bg-red-900/40 text-red-400">
+                AI failed · tap to retry
+              </span>
+            )}
+          </div>
         </div>
         <button
           onClick={e => { e.stopPropagation(); onDelete(entry.id) }}

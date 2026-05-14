@@ -19,6 +19,7 @@ export interface MealEntry {
   timestamp: string
   description: string
   tags: MealTag[]
+  tagsStatus?: 'pending' | 'done' | 'failed'
   fasted_period_before?: number
   created_at: string
 }

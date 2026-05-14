@@ -48,12 +48,16 @@ export function SettingsScreen() {
     if (!apiKey || reanalyzing) return
     setReanalyzing(true)
     const allMeals = (await db.entries.where('type').equals('meal').toArray()) as MealEntry[]
+    // Mark all as pending first so cards show "AI analyzing..."
+    await Promise.all(allMeals.map(m => saveMeal({ ...m, tagsStatus: 'pending' })))
     setReanalyzeProgress({ done: 0, total: allMeals.length })
     for (let i = 0; i < allMeals.length; i++) {
       try {
         const tags = await analyzeWithGemini(allMeals[i].description, apiKey)
-        await saveMeal({ ...allMeals[i], tags })
-      } catch { /* skip on error */ }
+        await saveMeal({ ...allMeals[i], tags, tagsStatus: 'done' })
+      } catch {
+        await saveMeal({ ...allMeals[i], tagsStatus: 'failed' })
+      }
       setReanalyzeProgress({ done: i + 1, total: allMeals.length })
       if (i < allMeals.length - 1) await new Promise(r => setTimeout(r, 250))
     }
