@@ -9,6 +9,13 @@ import { SleepSheet } from '../sheets/SleepSheet'
 import { WaterSheet } from '../sheets/WaterSheet'
 import { formatDuration, sleepDurationHours } from '../utils/time'
 import { format, startOfDay, endOfDay } from 'date-fns'
+import { useInsights } from '../hooks/useInsights'
+import { DEFAULT_CORRELATION_WINDOW, type CorrelationWindow } from '../db'
+
+function useCorrelationWindow(): CorrelationWindow {
+  const stored = localStorage.getItem('lucid:correlationWindow')
+  return (stored ? parseInt(stored) : DEFAULT_CORRELATION_WINDOW) as CorrelationWindow
+}
 
 function useRecentEntries(): Entry[] {
   return useLiveQuery(async () => {
@@ -53,6 +60,9 @@ function useTodaySummary() {
 export function DashboardScreen() {
   const entries = useRecentEntries()
   const summary = useTodaySummary()
+  const windowHours = useCorrelationWindow()
+  const insights = useInsights(windowHours)
+  const waterGoalMl = parseInt(localStorage.getItem('lucid:waterGoal') ?? '2000')
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [editEntry, setEditEntry] = useState<Entry | null>(null)
 
@@ -109,18 +119,50 @@ export function DashboardScreen() {
             </div>
           </div>
           {/* Water */}
-          <div className="bg-slate-800/70 border border-white/5 rounded-2xl p-4 flex items-center gap-3">
-            <div className="w-9 h-9 bg-cyan-500/20 rounded-xl flex items-center justify-center text-lg flex-shrink-0">💧</div>
-            <div>
-              <div className="text-2xl font-bold text-slate-100 leading-none">
-                {summary.totalWaterMl >= 1000
-                  ? `${(summary.totalWaterMl / 1000).toFixed(summary.totalWaterMl % 1000 === 0 ? 0 : 1)}L`
-                  : summary.totalWaterMl > 0
-                    ? `${summary.totalWaterMl}ml`
-                    : '—'}
+          <div className="bg-slate-800/70 border border-white/5 rounded-2xl p-4 flex flex-col gap-2.5">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 bg-cyan-500/20 rounded-xl flex items-center justify-center text-lg flex-shrink-0">💧</div>
+              <div>
+                <div className="text-2xl font-bold text-slate-100 leading-none">
+                  {summary.totalWaterMl >= 1000
+                    ? `${(summary.totalWaterMl / 1000).toFixed(summary.totalWaterMl % 1000 === 0 ? 0 : 1)}L`
+                    : summary.totalWaterMl > 0
+                      ? `${summary.totalWaterMl}ml`
+                      : '—'}
+                </div>
+                <div className="text-[11px] text-slate-500 mt-0.5 font-medium">
+                  {waterGoalMl > 0 ? `of ${waterGoalMl >= 1000 ? `${waterGoalMl / 1000}L` : `${waterGoalMl}ml`} goal` : 'Water today'}
+                </div>
               </div>
-              <div className="text-[11px] text-slate-500 mt-0.5 font-medium">Water today</div>
             </div>
+            {waterGoalMl > 0 && (
+              <div className="h-1.5 bg-slate-700 rounded-full overflow-hidden">
+                <div
+                  className="h-full rounded-full transition-all duration-700"
+                  style={{
+                    width: `${Math.min(100, (summary.totalWaterMl / waterGoalMl) * 100)}%`,
+                    background: summary.totalWaterMl >= waterGoalMl ? '#22d3ee' : '#0891b2',
+                  }}
+                />
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Insights */}
+      {insights.length > 0 && (
+        <div className="mx-4 mb-5 bg-indigo-950/60 border border-indigo-500/20 rounded-2xl p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-indigo-400 text-sm">✦</span>
+            <span className="text-[11px] font-bold text-indigo-400 uppercase tracking-widest">Insights</span>
+          </div>
+          <div className="space-y-2">
+            {insights.map((insight, i) => (
+              <p key={i} className="text-sm text-slate-300 leading-relaxed">
+                {insight}
+              </p>
+            ))}
           </div>
         </div>
       )}

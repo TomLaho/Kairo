@@ -30,6 +30,15 @@ export function SettingsScreen() {
   const sleep = useSleep()
   const fog = useBrainFog()
 
+  const [waterGoalMl, setWaterGoalMlState] = useState(() =>
+    parseInt(localStorage.getItem('lucid:waterGoal') ?? '2000'),
+  )
+
+  function handleSetWaterGoal(ml: number) {
+    localStorage.setItem('lucid:waterGoal', String(ml))
+    setWaterGoalMlState(ml)
+  }
+
   const [reanalyzing, setReanalyzing] = useState(false)
   const [reanalyzeProgress, setReanalyzeProgress] = useState<{ done: number; total: number } | null>(null)
   const [reanalyzeError, setReanalyzeError] = useState('')
@@ -132,6 +141,27 @@ export function SettingsScreen() {
               <div className="text-xl font-bold text-blue-400">{sleep.length}</div>
               <div className="text-xs text-slate-500">Sleep</div>
             </div>
+          </div>
+        </div>
+
+        {/* Water goal */}
+        <div className="bg-slate-800 rounded-2xl p-4">
+          <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-1">Daily water goal</h2>
+          <p className="text-xs text-slate-500 mb-3">Progress bar shows on the Today screen.</p>
+          <div className="flex gap-2 flex-wrap">
+            {[1000, 1500, 2000, 2500, 3000].map(ml => (
+              <button
+                key={ml}
+                onClick={() => handleSetWaterGoal(ml)}
+                className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors min-h-[44px] ${
+                  waterGoalMl === ml
+                    ? 'bg-cyan-600 text-white'
+                    : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                }`}
+              >
+                {ml >= 1000 ? `${ml / 1000}L` : `${ml}ml`}
+              </button>
+            ))}
           </div>
         </div>
 

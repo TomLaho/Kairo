@@ -4,6 +4,7 @@ import { CorrelationScatter } from '../charts/CorrelationScatter'
 import { SleepBarChart } from '../charts/SleepBarChart'
 import { MealTagsChart } from '../charts/MealTagsChart'
 import { TagFogAverageChart } from '../charts/TagFogAverageChart'
+import { FogHourChart } from '../charts/FogHourChart'
 import { DEFAULT_CORRELATION_WINDOW, type CorrelationWindow } from '../db'
 
 type Tab = 'fog' | 'sleep' | 'meals'
@@ -25,8 +26,9 @@ export function TrendsScreen() {
 
   return (
     <div className="pb-6">
-      <div className="px-4 pt-4 pb-3">
-        <h1 className="text-2xl font-bold text-slate-100">Trends</h1>
+      <div className="px-4 pt-6 pb-3">
+        <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-1">Analysis</p>
+        <h1 className="text-3xl font-bold text-slate-50">Trends</h1>
       </div>
 
       {/* Tab bar */}
@@ -62,6 +64,15 @@ export function TrendsScreen() {
               <p className="text-xs text-slate-500 mb-3">Within {windowHours}h window · coloured by meal tag</p>
               <div className="bg-slate-800 rounded-2xl p-3">
                 <CorrelationScatter windowHours={windowHours} />
+              </div>
+            </div>
+            <div>
+              <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wide mb-1">
+                Time of day
+              </h2>
+              <p className="text-xs text-slate-500 mb-3">Avg fog score by hour · green low · red high</p>
+              <div className="bg-slate-800 rounded-2xl p-3">
+                <FogHourChart />
               </div>
             </div>
           </>

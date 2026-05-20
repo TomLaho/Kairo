@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { BottomSheet } from '../components/BottomSheet'
 import { saveMeal } from '../hooks/useMeals'
 import { useMeals } from '../hooks/useMeals'
-import { newId, nowIso, MEAL_TAGS, TAG_COLORS, type MealEntry } from '../db'
+import { newId, nowIso, MEAL_TAGS, TAG_COLORS, type MealEntry, type MealTag } from '../db'
 import { toDatetimeLocal, fromDatetimeLocal, hoursBetween } from '../utils/time'
 import { analyzeWithAI, getAIKey } from '../utils/ai'
 
@@ -10,6 +10,7 @@ interface Props {
   isOpen: boolean
   onClose: () => void
   editEntry?: MealEntry
+  templateMeal?: MealEntry  // repeat-meal flow: pre-fill description, always add leftovers tag
 }
 
 function useLatestMeal(): MealEntry | null {
@@ -17,7 +18,7 @@ function useLatestMeal(): MealEntry | null {
   return meals[0] ?? null
 }
 
-export function MealSheet({ isOpen, onClose, editEntry }: Props) {
+export function MealSheet({ isOpen, onClose, editEntry, templateMeal }: Props) {
   const latestMeal = useLatestMeal()
 
   const [description, setDescription] = useState('')
@@ -28,8 +29,11 @@ export function MealSheet({ isOpen, onClose, editEntry }: Props) {
   const [error, setError] = useState('')
   const descRef = useRef<HTMLTextAreaElement>(null)
 
+  const isRepeat = !editEntry && !!templateMeal
+
   useEffect(() => {
     if (!isOpen) return
+    const now = nowIso()
     if (editEntry) {
       setDescription(editEntry.description)
       setTimestamp(toDatetimeLocal(editEntry.timestamp))
@@ -37,8 +41,7 @@ export function MealSheet({ isOpen, onClose, editEntry }: Props) {
       setFastedHours(editEntry.fasted_period_before !== undefined ? String(editEntry.fasted_period_before) : '')
       setShowFasted(editEntry.fasted_period_before !== undefined)
     } else {
-      const now = nowIso()
-      setDescription('')
+      setDescription(templateMeal?.description ?? '')
       setTimestamp(toDatetimeLocal(now))
       setTimestampEdited(false)
       setShowFasted(false)
@@ -52,7 +55,7 @@ export function MealSheet({ isOpen, onClose, editEntry }: Props) {
     }
     setError('')
     setTimeout(() => descRef.current?.focus(), 100)
-  }, [isOpen, editEntry]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isOpen, editEntry, templateMeal]) // eslint-disable-line react-hooks/exhaustive-deps
 
   async function handleSave() {
     if (!description.trim()) {
@@ -61,12 +64,15 @@ export function MealSheet({ isOpen, onClose, editEntry }: Props) {
     }
     const apiKey = getAIKey()
     const willAutoTag = !editEntry && !!apiKey
+
+    const initialTags: MealTag[] = isRepeat ? ['contains_leftovers'] : (editEntry?.tags ?? [])
+
     const entry: MealEntry = {
       id: editEntry?.id ?? newId(),
       type: 'meal',
       timestamp: fromDatetimeLocal(timestamp),
       description: description.trim(),
-      tags: editEntry?.tags ?? [],
+      tags: initialTags,
       tagsStatus: willAutoTag ? 'pending' : editEntry?.tagsStatus,
       fasted_period_before: fastedHours !== '' ? parseFloat(fastedHours) : undefined,
       created_at: editEntry?.created_at ?? nowIso(),
@@ -76,7 +82,13 @@ export function MealSheet({ isOpen, onClose, editEntry }: Props) {
 
     if (willAutoTag) {
       analyzeWithAI(description.trim())
-        .then(tags => saveMeal({ ...entry, tags, tagsStatus: 'done', tagsError: undefined }))
+        .then(geminiTags => {
+          // Always keep leftovers tag in repeat flow; merge with gemini results
+          const merged = isRepeat
+            ? [...new Set(['contains_leftovers' as MealTag, ...geminiTags])]
+            : geminiTags
+          return saveMeal({ ...entry, tags: merged, tagsStatus: 'done', tagsError: undefined })
+        })
         .catch((e: unknown) => saveMeal({
           ...entry,
           tagsStatus: 'failed',
@@ -99,9 +111,17 @@ export function MealSheet({ isOpen, onClose, editEntry }: Props) {
     onClose()
   }
 
+  const sheetTitle = editEntry ? 'Edit Meal' : isRepeat ? 'Log Again' : 'Log Meal'
+
   return (
-    <BottomSheet isOpen={isOpen} onClose={onClose} title={editEntry ? 'Edit Meal' : 'Log Meal'}>
+    <BottomSheet isOpen={isOpen} onClose={onClose} title={sheetTitle}>
       <div className="space-y-5 pb-2">
+        {isRepeat && (
+          <div className="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 rounded-xl px-3 py-2">
+            <span className="text-emerald-400 text-xs font-semibold">Leftovers tag will be added automatically</span>
+          </div>
+        )}
+
         {/* Timestamp */}
         <div>
           <label className="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wide">
@@ -130,7 +150,7 @@ export function MealSheet({ isOpen, onClose, editEntry }: Props) {
           {error && <p className="text-red-400 text-xs mt-1">{error}</p>}
         </div>
 
-        {/* AI tags (edit mode only — read-only display) */}
+        {/* AI tags (edit mode only) */}
         {editEntry && editEntry.tags.length > 0 && (
           <div>
             <label className="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-wide">
@@ -175,15 +195,13 @@ export function MealSheet({ isOpen, onClose, editEntry }: Props) {
           </div>
         )}
 
-        {/* Save */}
         <button
           onClick={handleSave}
           className="w-full py-4 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white font-semibold rounded-xl transition-colors text-base mt-2"
         >
-          {editEntry ? 'Save Changes' : 'Save Meal'}
+          {editEntry ? 'Save Changes' : isRepeat ? 'Log Again' : 'Save Meal'}
         </button>
 
-        {/* Re-analyze (edit mode only, requires API key) */}
         {editEntry && getAIKey() && (
           <button
             type="button"
