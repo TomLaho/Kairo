@@ -68,61 +68,83 @@ export function DashboardScreen() {
   return (
     <div className="pb-6">
       {/* Header */}
-      <div className="px-4 pt-4 pb-3">
-        <p className="text-xs text-slate-500 uppercase tracking-wide">{today}</p>
-        <h1 className="text-2xl font-bold text-slate-100">Today</h1>
+      <div className="px-4 pt-6 pb-4">
+        <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-1">{today}</p>
+        <h1 className="text-3xl font-bold text-slate-50">Today</h1>
       </div>
 
       {/* Summary strip */}
       {summary && (
-        <div className="mx-4 mb-4 grid grid-cols-2 gap-2">
-          <div className="bg-indigo-600/15 border border-indigo-500/20 rounded-xl p-3 text-center">
-            <div className="text-2xl font-bold text-indigo-400">{summary.mealCount}</div>
-            <div className="text-xs text-slate-400 mt-0.5">Meals</div>
-          </div>
-          <div className="bg-purple-600/15 border border-purple-500/20 rounded-xl p-3 text-center">
-            <div className="text-2xl font-bold text-purple-400">
-              {summary.latestFog ? summary.latestFog.score : '—'}
+        <div className="mx-4 mb-5 grid grid-cols-2 gap-2">
+          {/* Meals */}
+          <div className="bg-slate-800/70 border border-white/5 rounded-2xl p-4 flex items-center gap-3">
+            <div className="w-9 h-9 bg-indigo-500/20 rounded-xl flex items-center justify-center text-lg flex-shrink-0">🍽</div>
+            <div>
+              <div className="text-2xl font-bold text-slate-100 leading-none">{summary.mealCount}</div>
+              <div className="text-[11px] text-slate-500 mt-0.5 font-medium">Meals today</div>
             </div>
-            <div className="text-xs text-slate-400 mt-0.5">Latest fog</div>
           </div>
-          <div className="bg-blue-600/15 border border-blue-500/20 rounded-xl p-3 text-center">
-            <div className="text-2xl font-bold text-blue-400">
-              {summary.latestSleep
-                ? formatDuration(sleepDurationHours(summary.latestSleep.bedtime, summary.latestSleep.wake_time))
-                : '—'}
+          {/* Brain fog */}
+          <div className="bg-slate-800/70 border border-white/5 rounded-2xl p-4 flex items-center gap-3">
+            <div className="w-9 h-9 bg-purple-500/20 rounded-xl flex items-center justify-center text-lg flex-shrink-0">🧠</div>
+            <div>
+              <div className="text-2xl font-bold text-slate-100 leading-none">
+                {summary.latestFog ? summary.latestFog.score : '—'}
+              </div>
+              <div className="text-[11px] text-slate-500 mt-0.5 font-medium">
+                {summary.latestFog ? 'Fog score' : 'No fog logged'}
+              </div>
             </div>
-            <div className="text-xs text-slate-400 mt-0.5">Sleep</div>
           </div>
-          <div className="bg-cyan-600/15 border border-cyan-500/20 rounded-xl p-3 text-center">
-            <div className="text-2xl font-bold text-cyan-400">
-              {summary.totalWaterMl >= 1000
-                ? `${(summary.totalWaterMl / 1000).toFixed(summary.totalWaterMl % 1000 === 0 ? 0 : 1)}L`
-                : summary.totalWaterMl > 0
-                  ? `${summary.totalWaterMl}ml`
+          {/* Sleep */}
+          <div className="bg-slate-800/70 border border-white/5 rounded-2xl p-4 flex items-center gap-3">
+            <div className="w-9 h-9 bg-blue-500/20 rounded-xl flex items-center justify-center text-lg flex-shrink-0">🌙</div>
+            <div>
+              <div className="text-2xl font-bold text-slate-100 leading-none">
+                {summary.latestSleep
+                  ? formatDuration(sleepDurationHours(summary.latestSleep.bedtime, summary.latestSleep.wake_time))
                   : '—'}
+              </div>
+              <div className="text-[11px] text-slate-500 mt-0.5 font-medium">Last sleep</div>
             </div>
-            <div className="text-xs text-slate-400 mt-0.5">Water</div>
+          </div>
+          {/* Water */}
+          <div className="bg-slate-800/70 border border-white/5 rounded-2xl p-4 flex items-center gap-3">
+            <div className="w-9 h-9 bg-cyan-500/20 rounded-xl flex items-center justify-center text-lg flex-shrink-0">💧</div>
+            <div>
+              <div className="text-2xl font-bold text-slate-100 leading-none">
+                {summary.totalWaterMl >= 1000
+                  ? `${(summary.totalWaterMl / 1000).toFixed(summary.totalWaterMl % 1000 === 0 ? 0 : 1)}L`
+                  : summary.totalWaterMl > 0
+                    ? `${summary.totalWaterMl}ml`
+                    : '—'}
+              </div>
+              <div className="text-[11px] text-slate-500 mt-0.5 font-medium">Water today</div>
+            </div>
           </div>
         </div>
       )}
 
       {/* Feed */}
-      <div className="px-4 space-y-2">
+      <div className="px-4">
         {entries.length === 0 ? (
-          <div className="text-center py-16">
-            <p className="text-4xl mb-3">📋</p>
-            <p className="text-slate-400 text-sm">No entries yet. Tap Log to get started.</p>
+          <div className="text-center py-20">
+            <p className="text-5xl mb-4">📋</p>
+            <p className="text-slate-400 text-sm font-medium">No entries yet.</p>
+            <p className="text-slate-600 text-xs mt-1">Tap Log to start tracking.</p>
           </div>
         ) : (
-          entries.map(entry => (
-            <EntryCard
-              key={entry.id}
-              entry={entry}
-              onEdit={e => setEditEntry(e)}
-              onDelete={id => setDeleteId(id)}
-            />
-          ))
+          <div className="space-y-2">
+            <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-3">Recent</p>
+            {entries.map(entry => (
+              <EntryCard
+                key={entry.id}
+                entry={entry}
+                onEdit={e => setEditEntry(e)}
+                onDelete={id => setDeleteId(id)}
+              />
+            ))}
+          </div>
         )}
       </div>
 
