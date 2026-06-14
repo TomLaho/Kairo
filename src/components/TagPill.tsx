@@ -15,8 +15,8 @@ export function TagPill({ tag, selected, onToggle }: Props) {
       onClick={() => onToggle(tag)}
       className={`px-3 py-2 rounded-full text-sm font-medium transition-colors min-h-[44px] flex items-center ${
         selected
-          ? 'bg-indigo-600 text-white'
-          : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+          ? 'bg-spotlight text-ink'
+          : 'bg-white/[0.06] text-white/70 hover:bg-white/10'
       }`}
     >
       {label}

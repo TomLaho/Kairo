@@ -3,13 +3,14 @@ interface Props {
   onChange: (v: number) => void
 }
 
+// green → amber → red ramp, aligned to the tier palette
 const SCORE_COLORS = [
-  '#22c55e', '#4ade80', '#86efac', '#fbbf24', '#fbbf24',
-  '#f97316', '#f97316', '#ef4444', '#ef4444', '#dc2626', '#b91c1c',
+  '#3DD68C', '#6FDB7E', '#A8D86B', '#D6CF5E', '#FFB454',
+  '#FFA84E', '#FF9248', '#FF7E4E', '#FF6B6B', '#F85C5C', '#E84A4A',
 ]
 
 export function ScoreSlider({ value, onChange }: Props) {
-  const color = SCORE_COLORS[value] ?? '#94a3b8'
+  const color = SCORE_COLORS[value] ?? '#8B8590'
   const label =
     value <= 2 ? 'Clear' :
     value <= 4 ? 'Mild' :
@@ -20,7 +21,7 @@ export function ScoreSlider({ value, onChange }: Props) {
     <div className="space-y-3">
       <div className="flex items-baseline gap-3">
         <span className="text-6xl font-bold tabular-nums" style={{ color }}>{value}</span>
-        <span className="text-slate-400 text-lg">{label}</span>
+        <span className="text-white/55 text-lg">{label}</span>
       </div>
       <input
         type="range"
@@ -31,10 +32,10 @@ export function ScoreSlider({ value, onChange }: Props) {
         onChange={e => onChange(Number(e.target.value))}
         className="w-full h-3 rounded-full appearance-none cursor-pointer"
         style={{
-          background: `linear-gradient(to right, ${color} ${value * 10}%, #334155 ${value * 10}%)`,
+          background: `linear-gradient(to right, ${color} ${value * 10}%, #241D2E ${value * 10}%)`,
         }}
       />
-      <div className="flex justify-between text-xs text-slate-500">
+      <div className="flex justify-between text-xs text-white/40">
         <span>0</span>
         <span>5</span>
         <span>10</span>

@@ -14,7 +14,7 @@ export function MealTagsChart() {
 
   if (meals.length === 0) {
     return (
-      <div className="flex items-center justify-center h-36 text-slate-500 text-sm">
+      <div className="flex items-center justify-center h-36 text-white/40 text-sm">
         No meal entries yet
       </div>
     )
@@ -23,14 +23,14 @@ export function MealTagsChart() {
   return (
     <ResponsiveContainer width="100%" height={180}>
       <BarChart data={data} margin={{ top: 5, right: 16, bottom: 30, left: -10 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-        <XAxis dataKey="label" tick={{ fill: '#64748b', fontSize: 10 }} angle={-20} textAnchor="end" interval={0} />
-        <YAxis allowDecimals={false} tick={{ fill: '#64748b', fontSize: 11 }} />
+        <CartesianGrid strokeDasharray="3 3" stroke="#241D2E" />
+        <XAxis dataKey="label" tick={{ fill: '#8B8590', fontSize: 10 }} angle={-20} textAnchor="end" interval={0} />
+        <YAxis allowDecimals={false} tick={{ fill: '#8B8590', fontSize: 11 }} />
         <Tooltip
           formatter={(value: number) => [value, 'meals']}
-          contentStyle={{ background: '#1e293b', border: '1px solid #334155', borderRadius: 8, fontSize: 12 }}
-          labelStyle={{ color: '#94a3b8' }}
-          itemStyle={{ color: '#e2e8f0' }}
+          contentStyle={{ background: '#1B1622', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, fontSize: 12 }}
+          labelStyle={{ color: '#8B8590' }}
+          itemStyle={{ color: '#F5F4F7' }}
         />
         <Bar dataKey="count" radius={[4, 4, 0, 0]}>
           {data.map(d => <Cell key={d.tag} fill={d.color} opacity={0.85} />)}

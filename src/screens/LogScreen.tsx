@@ -14,27 +14,27 @@ const ENTRY_CARDS = [
     icon: '🍽',
     label: 'Log Meal',
     sub: 'What did you eat?',
-    accent: 'border-l-indigo-500',
-    glow: 'bg-indigo-500/8',
-    iconBg: 'bg-indigo-500/20',
+    accent: 'border-l-stage',
+    glow: 'bg-stage/8',
+    iconBg: 'bg-stage/20',
   },
   {
     type: 'brain_fog' as SheetType,
     icon: '🧠',
     label: 'Log Brain Fog',
     sub: 'Rate your mental clarity',
-    accent: 'border-l-purple-500',
-    glow: 'bg-purple-500/8',
-    iconBg: 'bg-purple-500/20',
+    accent: 'border-l-spotlight',
+    glow: 'bg-spotlight/8',
+    iconBg: 'bg-spotlight/15',
   },
   {
     type: 'sleep' as SheetType,
     icon: '🌙',
     label: 'Log Sleep',
     sub: "Last night's sleep",
-    accent: 'border-l-blue-500',
-    glow: 'bg-blue-500/8',
-    iconBg: 'bg-blue-500/20',
+    accent: 'border-l-moon',
+    glow: 'bg-moon/8',
+    iconBg: 'bg-moon/20',
   },
   {
     type: 'water' as SheetType,
@@ -48,7 +48,7 @@ const ENTRY_CARDS = [
 ]
 
 const ChevronRight = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-slate-600">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-white/30">
     <polyline points="9 18 15 12 9 6" />
   </svg>
 )
@@ -83,8 +83,8 @@ export function LogScreen() {
   return (
     <div className="px-4 pt-6 pb-4 space-y-2">
       <div className="mb-5">
-        <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-1">Track</p>
-        <h1 className="text-3xl font-bold text-slate-50">Log entry</h1>
+        <p className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-1">Track</p>
+        <h1 className="text-3xl font-bold text-white">Log entry</h1>
       </div>
 
       {ENTRY_CARDS.map(card => (
@@ -97,8 +97,8 @@ export function LogScreen() {
             {card.icon}
           </div>
           <div className="flex-1 min-w-0">
-            <div className="text-base font-semibold text-slate-100">{card.label}</div>
-            <div className="text-xs text-slate-400 mt-0.5">{card.sub}</div>
+            <div className="text-base font-semibold text-white">{card.label}</div>
+            <div className="text-xs text-white/55 mt-0.5">{card.sub}</div>
           </div>
           <ChevronRight />
         </button>
@@ -107,17 +107,17 @@ export function LogScreen() {
       {/* Repeat recent meals */}
       {recentMeals.length > 0 && (
         <div className="pt-3">
-          <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-2">Log again</p>
+          <p className="text-[11px] font-bold text-white/40 uppercase tracking-widest mb-2">Log again</p>
           <div className="flex flex-col gap-2">
             {recentMeals.map(meal => (
               <button
                 key={meal.id}
                 onClick={() => openRepeat(meal)}
-                className="w-full text-left bg-slate-800/50 border border-white/5 rounded-xl px-4 py-3 flex items-center gap-3 active:bg-slate-800 transition-colors"
+                className="w-full text-left bg-white/[0.05] border border-white/10 rounded-xl px-4 py-3 flex items-center gap-3 active:bg-white/[0.08] transition-colors"
               >
                 <span className="text-lg">↩</span>
-                <span className="text-sm text-slate-300 truncate flex-1">{meal.description}</span>
-                <span className="text-[10px] text-emerald-500 font-semibold flex-shrink-0">+ leftovers</span>
+                <span className="text-sm text-white/70 truncate flex-1">{meal.description}</span>
+                <span className="text-[10px] text-stage font-semibold flex-shrink-0">+ leftovers</span>
               </button>
             ))}
           </div>

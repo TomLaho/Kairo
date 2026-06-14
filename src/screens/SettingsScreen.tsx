@@ -3,8 +3,9 @@ import { db, CORRELATION_WINDOW_OPTIONS, DEFAULT_CORRELATION_WINDOW, type Correl
 import { useMeals } from '../hooks/useMeals'
 import { useSleep } from '../hooks/useSleep'
 import { useBrainFog } from '../hooks/useBrainFog'
+import { useWater } from '../hooks/useWater'
 import { saveMeal } from '../hooks/useMeals'
-import { exportMeals, exportSleep, exportBrainFog } from '../utils/export'
+import { exportAll } from '../utils/export'
 import { ConfirmModal } from '../components/ConfirmModal'
 import { getAIKey, setAIKey, getAIProvider, setAIProvider, analyzeWithAI, type AIProvider } from '../utils/ai'
 
@@ -29,6 +30,7 @@ export function SettingsScreen() {
   const meals = useMeals()
   const sleep = useSleep()
   const fog = useBrainFog()
+  const water = useWater()
 
   const [waterGoalMl, setWaterGoalMlState] = useState(() =>
     parseInt(localStorage.getItem('lucid:waterGoal') ?? '2000'),
@@ -111,43 +113,45 @@ export function SettingsScreen() {
   }
 
   function handleExport() {
-    exportMeals(meals)
-    setTimeout(() => exportSleep(sleep), 300)
-    setTimeout(() => exportBrainFog(fog), 600)
+    exportAll(meals, sleep, fog, water)
   }
 
-  const totalEntries = meals.length + sleep.length + fog.length
+  const totalEntries = meals.length + sleep.length + fog.length + water.length
 
   return (
     <div className="pb-6">
       <div className="px-4 pt-4 pb-3">
-        <h1 className="text-2xl font-bold text-slate-100">Settings</h1>
+        <h1 className="text-2xl font-bold text-white">Settings</h1>
       </div>
 
       <div className="px-4 space-y-3">
         {/* Stats */}
-        <div className="bg-slate-800 rounded-2xl p-4">
-          <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-3">Data</h2>
-          <div className="grid grid-cols-3 gap-3 text-center">
+        <div className="bg-white/[0.05] border border-white/10 rounded-2xl p-4">
+          <h2 className="text-xs font-semibold text-white/55 uppercase tracking-wide mb-3">Data</h2>
+          <div className="grid grid-cols-4 gap-3 text-center">
             <div>
-              <div className="text-xl font-bold text-indigo-400">{meals.length}</div>
-              <div className="text-xs text-slate-500">Meals</div>
+              <div className="text-xl font-bold text-stage">{meals.length}</div>
+              <div className="text-xs text-white/40">Meals</div>
             </div>
             <div>
-              <div className="text-xl font-bold text-purple-400">{fog.length}</div>
-              <div className="text-xs text-slate-500">Fog</div>
+              <div className="text-xl font-bold text-spotlight">{fog.length}</div>
+              <div className="text-xs text-white/40">Fog</div>
             </div>
             <div>
-              <div className="text-xl font-bold text-blue-400">{sleep.length}</div>
-              <div className="text-xs text-slate-500">Sleep</div>
+              <div className="text-xl font-bold text-moon">{sleep.length}</div>
+              <div className="text-xs text-white/40">Sleep</div>
+            </div>
+            <div>
+              <div className="text-xl font-bold text-cyan-400">{water.length}</div>
+              <div className="text-xs text-white/40">Water</div>
             </div>
           </div>
         </div>
 
         {/* Water goal */}
-        <div className="bg-slate-800 rounded-2xl p-4">
-          <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-1">Daily water goal</h2>
-          <p className="text-xs text-slate-500 mb-3">Progress bar shows on the Today screen.</p>
+        <div className="bg-white/[0.05] border border-white/10 rounded-2xl p-4">
+          <h2 className="text-xs font-semibold text-white/55 uppercase tracking-wide mb-1">Daily water goal</h2>
+          <p className="text-xs text-white/40 mb-3">Progress bar shows on the Today screen.</p>
           <div className="flex gap-2 flex-wrap">
             {[1000, 1500, 2000, 2500, 3000].map(ml => (
               <button
@@ -155,8 +159,8 @@ export function SettingsScreen() {
                 onClick={() => handleSetWaterGoal(ml)}
                 className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors min-h-[44px] ${
                   waterGoalMl === ml
-                    ? 'bg-cyan-600 text-white'
-                    : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                    ? 'bg-spotlight text-ink'
+                    : 'bg-white/[0.06] text-white/70 hover:bg-white/10'
                 }`}
               >
                 {ml >= 1000 ? `${ml / 1000}L` : `${ml}ml`}
@@ -166,18 +170,18 @@ export function SettingsScreen() {
         </div>
 
         {/* AI provider + key */}
-        <div className="bg-slate-800 rounded-2xl p-4">
-          <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-1">AI meal tagging</h2>
-          <p className="text-xs text-slate-500 mb-3">Key stays on this device only — never sent to GitHub.</p>
+        <div className="bg-white/[0.05] border border-white/10 rounded-2xl p-4">
+          <h2 className="text-xs font-semibold text-white/55 uppercase tracking-wide mb-1">AI meal tagging</h2>
+          <p className="text-xs text-white/40 mb-3">Key stays on this device only — never sent to GitHub.</p>
 
           {/* Provider toggle */}
-          <div className="flex bg-slate-700 rounded-xl p-1 gap-1 mb-3">
+          <div className="flex bg-white/[0.06] rounded-xl p-1 gap-1 mb-3">
             {(['gemini', 'xai'] as AIProvider[]).map(p => (
               <button
                 key={p}
                 onClick={() => handleProviderChange(p)}
                 className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${
-                  aiProvider === p ? 'bg-slate-600 text-slate-100 shadow' : 'text-slate-500 hover:text-slate-300'
+                  aiProvider === p ? 'bg-spotlight text-ink' : 'text-white/45 hover:text-white/70'
                 }`}
               >
                 {p === 'gemini' ? 'Gemini 2.0' : 'xAI Grok'}
@@ -191,11 +195,11 @@ export function SettingsScreen() {
               value={aiKey}
               onChange={e => { setAIKeyState(e.target.value); setKeySaved(false) }}
               placeholder={aiProvider === 'gemini' ? 'AIza…' : 'xai-…'}
-              className="flex-1 bg-slate-700 rounded-xl px-4 py-3 text-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono"
+              className="flex-1 bg-white/[0.06] rounded-xl px-4 py-3 text-white/90 text-sm focus:outline-none focus:ring-2 focus:ring-spotlight font-mono"
             />
             <button
               onClick={handleSaveKey}
-              className="px-4 py-3 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white text-sm font-semibold rounded-xl transition-colors whitespace-nowrap min-h-[44px]"
+              className="px-4 py-3 bg-spotlight hover:bg-spotlight-soft active:opacity-90 text-ink text-sm font-semibold rounded-xl transition-colors whitespace-nowrap min-h-[44px]"
             >
               {keySaved ? 'Saved ✓' : 'Save'}
             </button>
@@ -206,21 +210,21 @@ export function SettingsScreen() {
               <button
                 onClick={handleTestKey}
                 disabled={testStatus === 'testing'}
-                className="w-full py-2.5 bg-slate-700 hover:bg-slate-600 disabled:opacity-40 text-slate-200 text-sm font-medium rounded-xl transition-colors"
+                className="w-full py-2.5 bg-white/[0.06] hover:bg-white/10 disabled:opacity-40 text-white/80 text-sm font-medium rounded-xl transition-colors"
               >
                 {testStatus === 'testing' ? 'Testing…' : testStatus === 'ok' ? '✓ Connected — key works' : testStatus === 'error' ? '✕ Test failed — see error below' : 'Test API key'}
               </button>
               {testStatus === 'error' && testError && (
-                <p className="text-xs text-red-400 bg-red-900/20 rounded-xl px-3 py-2 break-words">{testError}</p>
+                <p className="text-xs text-tier-red bg-tier-red/10 rounded-xl px-3 py-2 break-words">{testError}</p>
               )}
               {testStatus === 'ok' && (
-                <p className="text-xs text-emerald-400">Connected. Re-analyze your meals below.</p>
+                <p className="text-xs text-stage">Connected. Re-analyze your meals below.</p>
               )}
               <div className="flex items-center gap-3">
                 <button
                   onClick={handleReanalyzeMeals}
                   disabled={reanalyzing || meals.length === 0}
-                  className="flex-1 py-2.5 bg-slate-700 hover:bg-slate-600 active:bg-slate-500 disabled:opacity-40 disabled:cursor-not-allowed text-slate-200 text-sm font-medium rounded-xl transition-colors"
+                  className="flex-1 py-2.5 bg-white/[0.06] hover:bg-white/10 active:bg-white/[0.08] disabled:opacity-40 disabled:cursor-not-allowed text-white/80 text-sm font-medium rounded-xl transition-colors"
                 >
                   {reanalyzing && reanalyzeProgress
                     ? `Analyzing… ${reanalyzeProgress.done}/${reanalyzeProgress.total}`
@@ -228,13 +232,13 @@ export function SettingsScreen() {
                 </button>
                 <button
                   onClick={handleClearKey}
-                  className="text-xs text-slate-500 hover:text-red-400 transition-colors px-2 py-1"
+                  className="text-xs text-white/40 hover:text-tier-red transition-colors px-2 py-1"
                 >
                   Clear key
                 </button>
               </div>
               {reanalyzeError && (
-                <p className="text-xs text-red-400 bg-red-900/20 rounded-xl px-3 py-2 break-words">
+                <p className="text-xs text-tier-red bg-tier-red/10 rounded-xl px-3 py-2 break-words">
                   Last error: {reanalyzeError}
                 </p>
               )}
@@ -243,9 +247,9 @@ export function SettingsScreen() {
         </div>
 
         {/* Correlation window */}
-        <div className="bg-slate-800 rounded-2xl p-4">
-          <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-1">Correlation window</h2>
-          <p className="text-xs text-slate-500 mb-3">
+        <div className="bg-white/[0.05] border border-white/10 rounded-2xl p-4">
+          <h2 className="text-xs font-semibold text-white/55 uppercase tracking-wide mb-1">Correlation window</h2>
+          <p className="text-xs text-white/40 mb-3">
             Max hours after a meal that a fog entry is linked to it in the scatter plot.
             Use 12–16h to capture overnight effects.
           </p>
@@ -256,8 +260,8 @@ export function SettingsScreen() {
                 onClick={() => setWindowHours(h)}
                 className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors min-h-[44px] ${
                   windowHours === h
-                    ? 'bg-indigo-600 text-white'
-                    : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                    ? 'bg-spotlight text-ink'
+                    : 'bg-white/[0.06] text-white/70 hover:bg-white/10'
                 }`}
               >
                 {h}h
@@ -267,32 +271,32 @@ export function SettingsScreen() {
         </div>
 
         {/* Export */}
-        <div className="bg-slate-800 rounded-2xl p-4">
-          <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-1">Export</h2>
-          <p className="text-xs text-slate-500 mb-3">Downloads three CSV files: meals, sleep, and brain fog.</p>
+        <div className="bg-white/[0.05] border border-white/10 rounded-2xl p-4">
+          <h2 className="text-xs font-semibold text-white/55 uppercase tracking-wide mb-1">Export</h2>
+          <p className="text-xs text-white/40 mb-3">Downloads a single CSV with all your meals, sleep, brain fog, and water entries.</p>
           <button
             onClick={handleExport}
             disabled={totalEntries === 0}
-            className="w-full py-3 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition-colors"
+            className="w-full py-3 bg-spotlight hover:bg-spotlight-soft active:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed text-ink font-semibold rounded-xl transition-colors"
           >
             Export CSV ({totalEntries} entries)
           </button>
         </div>
 
         {/* Danger zone */}
-        <div className="bg-slate-800 rounded-2xl p-4 border border-red-900/30">
-          <h2 className="text-xs font-semibold text-red-400 uppercase tracking-wide mb-1">Danger zone</h2>
-          <p className="text-xs text-slate-500 mb-3">This permanently deletes all your data.</p>
+        <div className="bg-tier-red/[0.06] rounded-2xl p-4 border border-tier-red/20">
+          <h2 className="text-xs font-semibold text-tier-red uppercase tracking-wide mb-1">Danger zone</h2>
+          <p className="text-xs text-white/40 mb-3">This permanently deletes all your data.</p>
           <button
             onClick={() => setConfirmClear(true)}
             disabled={totalEntries === 0}
-            className="w-full py-3 bg-red-900/40 hover:bg-red-800/60 active:bg-red-900 disabled:opacity-40 disabled:cursor-not-allowed text-red-300 font-semibold rounded-xl transition-colors border border-red-800/40"
+            className="w-full py-3 bg-tier-red/15 hover:bg-tier-red/25 active:bg-tier-red/30 disabled:opacity-40 disabled:cursor-not-allowed text-tier-red font-semibold rounded-xl transition-colors border border-tier-red/30"
           >
             Clear all data
           </button>
         </div>
 
-        <p className="text-center text-xs text-slate-600 pt-2">Lucid v0.1.0</p>
+        <p className="text-center text-xs text-white/30 pt-2">Lucid v0.1.0</p>
       </div>
 
       <ConfirmModal

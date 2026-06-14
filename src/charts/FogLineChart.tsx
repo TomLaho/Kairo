@@ -21,9 +21,9 @@ function CustomTooltip({ active, payload }: { active?: boolean; payload?: Toolti
   if (!active || !payload?.[0]?.payload) return null
   const p = payload[0].payload
   return (
-    <div className="bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-xs text-slate-200 shadow-lg">
+    <div className="bg-ink-700 border border-white/10 rounded-lg px-3 py-2 text-xs text-white/90 shadow-lg">
       <div className="font-medium">{p.label}</div>
-      <div>Fog: <span className="font-bold text-purple-300">{p.score}/10</span></div>
+      <div>Fog: <span className="font-bold text-spotlight">{p.score}/10</span></div>
     </div>
   )
 }
@@ -43,7 +43,7 @@ export function FogLineChart() {
 
   if (data.length === 0) {
     return (
-      <div className="flex items-center justify-center h-36 text-slate-500 text-sm">
+      <div className="flex items-center justify-center h-36 text-white/40 text-sm">
         No brain fog entries in the last 7 days
       </div>
     )
@@ -52,26 +52,26 @@ export function FogLineChart() {
   return (
     <ResponsiveContainer width="100%" height={180}>
       <LineChart data={data} margin={{ top: 5, right: 16, bottom: 5, left: -10 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+        <CartesianGrid strokeDasharray="3 3" stroke="#241D2E" />
         <XAxis
           dataKey="time"
           type="number"
           scale="time"
           domain={['dataMin', 'dataMax']}
           tickFormatter={v => formatTime(new Date(v).toISOString())}
-          tick={{ fill: '#64748b', fontSize: 10 }}
+          tick={{ fill: '#8B8590', fontSize: 10 }}
           minTickGap={40}
         />
-        <YAxis domain={[0, 10]} tick={{ fill: '#64748b', fontSize: 11 }} />
+        <YAxis domain={[0, 10]} tick={{ fill: '#8B8590', fontSize: 11 }} />
         <Tooltip content={<CustomTooltip />} />
-        <ReferenceLine y={5} stroke="#475569" strokeDasharray="4 4" />
+        <ReferenceLine y={5} stroke="#3A3540" strokeDasharray="4 4" />
         <Line
           type="monotone"
           dataKey="score"
-          stroke="#a78bfa"
+          stroke="#FFC857"
           strokeWidth={2}
-          dot={{ fill: '#a78bfa', r: 4 }}
-          activeDot={{ r: 6, fill: '#c4b5fd' }}
+          dot={{ fill: '#FFC857', r: 4 }}
+          activeDot={{ r: 6, fill: '#FFD98A' }}
         />
       </LineChart>
     </ResponsiveContainer>

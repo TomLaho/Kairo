@@ -6,7 +6,7 @@ export function App() {
   if (location.pathname === '/') return <Navigate to="/log" replace />
 
   return (
-    <div className="min-h-dvh text-slate-100 pb-[calc(56px+env(safe-area-inset-bottom,0px))]">
+    <div className="min-h-dvh text-white pb-[calc(56px+env(safe-area-inset-bottom,0px))]">
       <main className="max-w-xl mx-auto">
         <Outlet />
       </main>

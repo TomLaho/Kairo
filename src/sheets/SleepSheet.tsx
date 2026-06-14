@@ -74,49 +74,49 @@ export function SleepSheet({ isOpen, onClose, editEntry }: Props) {
       <div className="space-y-5 pb-2">
         {/* Bedtime */}
         <div>
-          <label className="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wide">Bedtime</label>
+          <label className="block text-xs font-medium text-white/55 mb-1.5 uppercase tracking-wide">Bedtime</label>
           <input
             type="datetime-local"
             value={bedtime}
             onChange={e => { setBedtime(e.target.value); setError('') }}
-            className="w-full bg-slate-700 rounded-xl px-4 py-3 text-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full bg-white/[0.06] rounded-xl px-4 py-3 text-white/90 text-sm focus:outline-none focus:ring-2 focus:ring-spotlight"
           />
         </div>
 
         {/* Wake time */}
         <div>
-          <label className="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wide">Wake time</label>
+          <label className="block text-xs font-medium text-white/55 mb-1.5 uppercase tracking-wide">Wake time</label>
           <input
             type="datetime-local"
             value={wakeTime}
             onChange={e => { setWakeTime(e.target.value); setError('') }}
-            className="w-full bg-slate-700 rounded-xl px-4 py-3 text-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full bg-white/[0.06] rounded-xl px-4 py-3 text-white/90 text-sm focus:outline-none focus:ring-2 focus:ring-spotlight"
           />
         </div>
 
         {/* Duration preview */}
         {duration !== null && duration > 0 && (
-          <p className="text-slate-400 text-sm">Duration: <span className="text-slate-200 font-medium">{formatDuration(duration)}</span></p>
+          <p className="text-white/55 text-sm">Duration: <span className="text-white/90 font-medium">{formatDuration(duration)}</span></p>
         )}
 
-        {error && <p className="text-red-400 text-xs">{error}</p>}
+        {error && <p className="text-tier-red text-xs">{error}</p>}
 
         {/* Wakeups */}
         <div>
-          <label className="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-wide">Wake-ups</label>
+          <label className="block text-xs font-medium text-white/55 mb-2 uppercase tracking-wide">Wake-ups</label>
           <div className="flex items-center gap-4">
             <button
               type="button"
               onClick={() => setWakeups(w => Math.max(0, w - 1))}
-              className="w-11 h-11 rounded-xl bg-slate-700 text-slate-200 text-xl font-bold hover:bg-slate-600 transition-colors flex items-center justify-center"
+              className="w-11 h-11 rounded-xl bg-white/[0.06] text-white/90 text-xl font-bold hover:bg-white/10 transition-colors flex items-center justify-center"
             >
               −
             </button>
-            <span className="text-2xl font-bold text-slate-100 w-8 text-center tabular-nums">{wakeups}</span>
+            <span className="text-2xl font-bold text-white w-8 text-center tabular-nums">{wakeups}</span>
             <button
               type="button"
               onClick={() => setWakeups(w => w + 1)}
-              className="w-11 h-11 rounded-xl bg-slate-700 text-slate-200 text-xl font-bold hover:bg-slate-600 transition-colors flex items-center justify-center"
+              className="w-11 h-11 rounded-xl bg-white/[0.06] text-white/90 text-xl font-bold hover:bg-white/10 transition-colors flex items-center justify-center"
             >
               +
             </button>
@@ -128,13 +128,13 @@ export function SleepSheet({ isOpen, onClose, editEntry }: Props) {
           <button
             type="button"
             onClick={() => setShowBodyBattery(true)}
-            className="text-sm text-indigo-400 hover:text-indigo-300 transition-colors"
+            className="text-sm text-spotlight hover:text-spotlight-soft transition-colors"
           >
             + Add body battery score
           </button>
         ) : (
           <div>
-            <label className="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wide">Body battery (0–100)</label>
+            <label className="block text-xs font-medium text-white/55 mb-1.5 uppercase tracking-wide">Body battery (0–100)</label>
             <input
               type="number"
               min={0}
@@ -144,7 +144,7 @@ export function SleepSheet({ isOpen, onClose, editEntry }: Props) {
               onChange={e => setBodyBattery(e.target.value)}
               placeholder="e.g. 72"
               autoFocus
-              className="w-32 bg-slate-700 rounded-xl px-4 py-3 text-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-32 bg-white/[0.06] rounded-xl px-4 py-3 text-white/90 text-sm focus:outline-none focus:ring-2 focus:ring-spotlight"
             />
           </div>
         )}
@@ -152,7 +152,7 @@ export function SleepSheet({ isOpen, onClose, editEntry }: Props) {
         {/* Save */}
         <button
           onClick={handleSave}
-          className="w-full py-4 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white font-semibold rounded-xl transition-colors text-base mt-2"
+          className="w-full py-4 bg-spotlight hover:bg-spotlight-soft active:opacity-90 text-ink font-semibold rounded-xl transition-colors text-base mt-2"
         >
           {editEntry ? 'Save Changes' : 'Save Sleep'}
         </button>

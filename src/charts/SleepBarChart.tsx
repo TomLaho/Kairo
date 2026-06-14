@@ -21,7 +21,7 @@ interface TooltipPayload {
 function CustomTooltip({ active, payload, label }: { active?: boolean; payload?: TooltipPayload[]; label?: string }) {
   if (!active || !payload?.length) return null
   return (
-    <div className="bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-xs text-slate-200 shadow-lg">
+    <div className="bg-ink-700 border border-white/10 rounded-lg px-3 py-2 text-xs text-white/90 shadow-lg">
       <div className="font-medium mb-1">{label}</div>
       {payload.map(p => (
         <div key={p.name} style={{ color: p.color }}>
@@ -47,7 +47,7 @@ export function SleepBarChart() {
 
   if (data.length === 0) {
     return (
-      <div className="flex items-center justify-center h-36 text-slate-500 text-sm">
+      <div className="flex items-center justify-center h-36 text-white/40 text-sm">
         No sleep entries in the last 14 days
       </div>
     )
@@ -58,15 +58,15 @@ export function SleepBarChart() {
   return (
     <ResponsiveContainer width="100%" height={200}>
       <ComposedChart data={data} margin={{ top: 5, right: 16, bottom: 20, left: -10 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-        <XAxis dataKey="date" tick={{ fill: '#64748b', fontSize: 10 }} angle={-30} textAnchor="end" interval={0} />
-        <YAxis yAxisId="left" domain={[0, 12]} tick={{ fill: '#64748b', fontSize: 11 }} />
-        {hasBattery && <YAxis yAxisId="right" orientation="right" domain={[0, 100]} tick={{ fill: '#64748b', fontSize: 11 }} />}
+        <CartesianGrid strokeDasharray="3 3" stroke="#241D2E" />
+        <XAxis dataKey="date" tick={{ fill: '#8B8590', fontSize: 10 }} angle={-30} textAnchor="end" interval={0} />
+        <YAxis yAxisId="left" domain={[0, 12]} tick={{ fill: '#8B8590', fontSize: 11 }} />
+        {hasBattery && <YAxis yAxisId="right" orientation="right" domain={[0, 100]} tick={{ fill: '#8B8590', fontSize: 11 }} />}
         <Tooltip content={<CustomTooltip />} />
-        <Legend wrapperStyle={{ fontSize: 11, paddingTop: 8 }} formatter={(v: string) => <span style={{ color: '#94a3b8' }}>{v}</span>} />
-        <Bar yAxisId="left" dataKey="duration" name="Sleep (h)" fill="#3b82f6" opacity={0.8} radius={[4, 4, 0, 0]} />
+        <Legend wrapperStyle={{ fontSize: 11, paddingTop: 8 }} formatter={(v: string) => <span style={{ color: '#8B8590' }}>{v}</span>} />
+        <Bar yAxisId="left" dataKey="duration" name="Sleep (h)" fill="#8AA2FF" opacity={0.85} radius={[4, 4, 0, 0]} />
         {hasBattery && (
-          <Line yAxisId="right" type="monotone" dataKey="battery" name="Body battery" stroke="#10b981" strokeWidth={2} dot={{ r: 3, fill: '#10b981' }} connectNulls />
+          <Line yAxisId="right" type="monotone" dataKey="battery" name="Body battery" stroke="#3DD68C" strokeWidth={2} dot={{ r: 3, fill: '#3DD68C' }} connectNulls />
         )}
       </ComposedChart>
     </ResponsiveContainer>

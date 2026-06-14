@@ -67,7 +67,7 @@ export function WaterSheet({ isOpen, onClose, editEntry }: Props) {
       <div className="space-y-5 pb-2">
         {/* Amount display */}
         <div className="text-center py-2">
-          <div className="text-5xl font-bold text-blue-400 tabular-nums">
+          <div className="text-5xl font-bold text-cyan-400 tabular-nums">
             {effectiveAmount >= 1000
               ? `${(effectiveAmount / 1000).toFixed(effectiveAmount % 1000 === 0 ? 0 : 1)}L`
               : `${effectiveAmount}ml`}
@@ -83,8 +83,8 @@ export function WaterSheet({ isOpen, onClose, editEntry }: Props) {
               onClick={() => selectPreset(p.ml)}
               className={`py-3 rounded-xl text-sm font-medium transition-colors ${
                 !useCustom && amountMl === p.ml
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                  ? 'bg-spotlight text-ink'
+                  : 'bg-white/[0.06] text-white/70 hover:bg-white/10'
               }`}
             >
               {p.label}
@@ -94,7 +94,7 @@ export function WaterSheet({ isOpen, onClose, editEntry }: Props) {
 
         {/* Custom amount */}
         <div>
-          <label className="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wide">
+          <label className="block text-xs font-medium text-white/55 mb-1.5 uppercase tracking-wide">
             Custom amount (ml)
           </label>
           <input
@@ -104,21 +104,21 @@ export function WaterSheet({ isOpen, onClose, editEntry }: Props) {
             value={customInput}
             onChange={e => { setCustomInput(e.target.value); setUseCustom(true) }}
             placeholder="e.g. 330"
-            className="w-36 bg-slate-700 rounded-xl px-4 py-3 text-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-36 bg-white/[0.06] rounded-xl px-4 py-3 text-white/90 text-sm focus:outline-none focus:ring-2 focus:ring-spotlight"
           />
         </div>
 
         {/* Timestamp */}
         <div>
-          <label className="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wide">
+          <label className="block text-xs font-medium text-white/55 mb-1.5 uppercase tracking-wide">
             When
-            {timestampEdited && <span className="ml-2 text-indigo-400 normal-case tracking-normal">edited</span>}
+            {timestampEdited && <span className="ml-2 text-spotlight normal-case tracking-normal">edited</span>}
           </label>
           <input
             type="datetime-local"
             value={timestamp}
             onChange={e => { setTimestamp(e.target.value); setTimestampEdited(true) }}
-            className="w-full bg-slate-700 rounded-xl px-4 py-3 text-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full bg-white/[0.06] rounded-xl px-4 py-3 text-white/90 text-sm focus:outline-none focus:ring-2 focus:ring-spotlight"
           />
         </div>
 
@@ -126,7 +126,7 @@ export function WaterSheet({ isOpen, onClose, editEntry }: Props) {
         <button
           onClick={handleSave}
           disabled={effectiveAmount <= 0}
-          className="w-full py-4 bg-blue-600 hover:bg-blue-500 active:bg-blue-700 disabled:opacity-40 text-white font-semibold rounded-xl transition-colors text-base"
+          className="w-full py-4 bg-spotlight hover:bg-spotlight-soft active:opacity-90 disabled:opacity-40 text-ink font-semibold rounded-xl transition-colors text-base"
         >
           {editEntry ? 'Save Changes' : 'Log Water'}
         </button>

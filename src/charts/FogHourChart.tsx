@@ -9,7 +9,7 @@ function hourLabel(h: number): string {
 
 function fogColor(avg: number | null): string {
   if (avg === null) return 'transparent'
-  return avg <= 3 ? '#10b981' : avg <= 6 ? '#f59e0b' : '#ef4444'
+  return avg <= 3 ? '#3DD68C' : avg <= 6 ? '#FFB454' : '#FF6B6B'
 }
 
 export function FogHourChart() {
@@ -30,8 +30,8 @@ export function FogHourChart() {
   if (fogEntries.length < 3) {
     return (
       <div className="flex flex-col items-center justify-center h-36 gap-1 text-center px-4">
-        <p className="text-slate-500 text-sm">Not enough data yet</p>
-        <p className="text-slate-600 text-xs">Log at least 3 fog entries to see time-of-day patterns</p>
+        <p className="text-white/40 text-sm">Not enough data yet</p>
+        <p className="text-white/30 text-xs">Log at least 3 fog entries to see time-of-day patterns</p>
       </div>
     )
   }
@@ -39,17 +39,17 @@ export function FogHourChart() {
   return (
     <ResponsiveContainer width="100%" height={180}>
       <BarChart data={hourData} margin={{ top: 5, right: 8, bottom: 5, left: -22 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
-        <XAxis dataKey="label" tick={{ fill: '#475569', fontSize: 9 }} interval={2} tickLine={false} axisLine={false} />
-        <YAxis domain={[0, 10]} tick={{ fill: '#475569', fontSize: 10 }} tickLine={false} axisLine={false} />
+        <CartesianGrid strokeDasharray="3 3" stroke="#241D2E" vertical={false} />
+        <XAxis dataKey="label" tick={{ fill: '#6B6675', fontSize: 9 }} interval={2} tickLine={false} axisLine={false} />
+        <YAxis domain={[0, 10]} tick={{ fill: '#6B6675', fontSize: 10 }} tickLine={false} axisLine={false} />
         <Tooltip
           formatter={(value: number, _: string, props: { payload?: { count: number } }) => [
             `${value}/10 (${props.payload?.count ?? 0} entries)`,
             'Avg fog',
           ]}
-          contentStyle={{ background: '#1e293b', border: '1px solid #334155', borderRadius: 8, fontSize: 12 }}
-          labelStyle={{ color: '#94a3b8' }}
-          itemStyle={{ color: '#e2e8f0' }}
+          contentStyle={{ background: '#1B1622', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, fontSize: 12 }}
+          labelStyle={{ color: '#8B8590' }}
+          itemStyle={{ color: '#F5F4F7' }}
         />
         <Bar dataKey="avgFog" radius={[3, 3, 0, 0]} maxBarSize={18}>
           {hourData.map((d, i) => (

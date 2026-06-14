@@ -11,7 +11,7 @@ const SettingsScreen = lazy(() => import('./screens/SettingsScreen'))
 
 function Loading() {
   return (
-    <div className="flex items-center justify-center min-h-[60vh] text-slate-500 text-sm">
+    <div className="flex items-center justify-center min-h-[60vh] text-white/40 text-sm">
       Loading…
     </div>
   )

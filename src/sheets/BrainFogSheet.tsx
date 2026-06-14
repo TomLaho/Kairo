@@ -53,21 +53,21 @@ export function BrainFogSheet({ isOpen, onClose, editEntry }: Props) {
       <div className="space-y-6 pb-2">
         {/* Score */}
         <div>
-          <label className="block text-xs font-medium text-slate-400 mb-3 uppercase tracking-wide">Fog level</label>
+          <label className="block text-xs font-medium text-white/55 mb-3 uppercase tracking-wide">Fog level</label>
           <ScoreSlider value={score} onChange={setScore} />
         </div>
 
         {/* Timestamp */}
         <div>
-          <label className="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wide">
+          <label className="block text-xs font-medium text-white/55 mb-1.5 uppercase tracking-wide">
             When
-            {timestampEdited && <span className="ml-2 text-indigo-400 normal-case tracking-normal">edited</span>}
+            {timestampEdited && <span className="ml-2 text-spotlight normal-case tracking-normal">edited</span>}
           </label>
           <input
             type="datetime-local"
             value={timestamp}
             onChange={e => { setTimestamp(e.target.value); setTimestampEdited(true) }}
-            className="w-full bg-slate-700 rounded-xl px-4 py-3 text-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full bg-white/[0.06] rounded-xl px-4 py-3 text-white/90 text-sm focus:outline-none focus:ring-2 focus:ring-spotlight"
           />
         </div>
 
@@ -76,20 +76,20 @@ export function BrainFogSheet({ isOpen, onClose, editEntry }: Props) {
           <button
             type="button"
             onClick={() => setShowNote(true)}
-            className="text-sm text-indigo-400 hover:text-indigo-300 transition-colors"
+            className="text-sm text-spotlight hover:text-spotlight-soft transition-colors"
           >
             + Add context note
           </button>
         ) : (
           <div>
-            <label className="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wide">Context</label>
+            <label className="block text-xs font-medium text-white/55 mb-1.5 uppercase tracking-wide">Context</label>
             <textarea
               value={note}
               onChange={e => setNote(e.target.value)}
               placeholder="e.g. Just woke up, 3h after dinner"
               rows={2}
               autoFocus
-              className="w-full bg-slate-700 rounded-xl px-4 py-3 text-slate-200 placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+              className="w-full bg-white/[0.06] rounded-xl px-4 py-3 text-white/90 placeholder-white/35 text-sm focus:outline-none focus:ring-2 focus:ring-spotlight resize-none"
             />
           </div>
         )}
@@ -97,7 +97,7 @@ export function BrainFogSheet({ isOpen, onClose, editEntry }: Props) {
         {/* Save */}
         <button
           onClick={handleSave}
-          className="w-full py-4 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white font-semibold rounded-xl transition-colors text-base mt-2"
+          className="w-full py-4 bg-spotlight hover:bg-spotlight-soft active:opacity-90 text-ink font-semibold rounded-xl transition-colors text-base mt-2"
         >
           {editEntry ? 'Save Changes' : 'Save'}
         </button>

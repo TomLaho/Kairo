@@ -42,21 +42,21 @@ export function BottomSheet({ isOpen, onClose, title, children }: Props) {
       {/* Sheet */}
       <div
         ref={sheetRef}
-        className={`absolute bottom-0 left-0 right-0 bg-slate-900 border-t border-white/8 rounded-t-3xl transition-transform duration-300 ease-out max-h-[92dvh] flex flex-col ${
+        className={`absolute bottom-0 left-0 right-0 bg-ink-800 border-t border-white/10 rounded-t-3xl transition-transform duration-300 ease-out max-h-[92dvh] flex flex-col ${
           isOpen ? 'translate-y-0' : 'translate-y-full'
         }`}
       >
         {/* Handle */}
         <div className="flex justify-center pt-3 pb-2 flex-shrink-0">
-          <div className="w-9 h-[3px] rounded-full bg-slate-700" />
+          <div className="w-9 h-[3px] rounded-full bg-white/20" />
         </div>
 
         {/* Header */}
         <div className="flex items-center justify-between px-5 pt-1 pb-4 flex-shrink-0 border-b border-white/5">
-          <h2 className="text-lg font-bold text-slate-100">{title}</h2>
+          <h2 className="text-lg font-bold text-white">{title}</h2>
           <button
             onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded-full text-slate-500 hover:text-slate-200 hover:bg-slate-800 transition-colors text-sm"
+            className="w-8 h-8 flex items-center justify-center rounded-full text-white/40 hover:text-white hover:bg-white/10 transition-colors text-sm"
             aria-label="Close"
           >
             ✕

@@ -18,9 +18,9 @@ const TrashIcon = () => (
 )
 
 const FOG_COLOR = (score: number) =>
-  score <= 3 ? { bg: 'bg-emerald-500/15', text: 'text-emerald-400', border: 'border-emerald-500/30' }
-  : score <= 6 ? { bg: 'bg-amber-500/15', text: 'text-amber-400', border: 'border-amber-500/30' }
-  : { bg: 'bg-red-500/15', text: 'text-red-400', border: 'border-red-500/30' }
+  score <= 3 ? { bg: 'bg-tier-green/15', text: 'text-tier-green', border: 'border-tier-green/30' }
+  : score <= 6 ? { bg: 'bg-tier-amber/15', text: 'text-tier-amber', border: 'border-tier-amber/30' }
+  : { bg: 'bg-tier-red/15', text: 'text-tier-red', border: 'border-tier-red/30' }
 
 function CardShell({ accentColor, children, onEdit, onDelete, entry }: {
   accentColor: string
@@ -31,7 +31,7 @@ function CardShell({ accentColor, children, onEdit, onDelete, entry }: {
 }) {
   return (
     <button
-      className="w-full text-left bg-slate-800/60 border border-white/4 rounded-2xl overflow-hidden flex active:bg-slate-800 transition-colors group"
+      className="w-full text-left bg-white/[0.05] border border-white/10 rounded-2xl overflow-hidden flex active:bg-white/[0.08] transition-colors group"
       onClick={onEdit}
     >
       <div className={`w-1 self-stretch ${accentColor} flex-shrink-0`} />
@@ -39,7 +39,7 @@ function CardShell({ accentColor, children, onEdit, onDelete, entry }: {
         {children}
         <button
           onClick={e => { e.stopPropagation(); onDelete() }}
-          className="text-slate-700 hover:text-red-400 transition-colors p-1 flex-shrink-0 -mt-0.5 -mr-1 opacity-0 group-hover:opacity-100 group-active:opacity-100"
+          className="text-white/25 hover:text-tier-red transition-colors p-1 flex-shrink-0 -mt-0.5 -mr-1 opacity-0 group-hover:opacity-100 group-active:opacity-100"
           aria-label="Delete"
         >
           <TrashIcon />
@@ -52,13 +52,13 @@ function CardShell({ accentColor, children, onEdit, onDelete, entry }: {
 function MealCard({ entry, onEdit, onDelete }: { entry: MealEntry } & Omit<Props, 'entry'>) {
   const { tagsStatus, tags } = entry
   return (
-    <CardShell accentColor="bg-indigo-500" onEdit={() => onEdit(entry)} onDelete={() => onDelete(entry.id)} entry={entry}>
+    <CardShell accentColor="bg-stage" onEdit={() => onEdit(entry)} onDelete={() => onDelete(entry.id)} entry={entry}>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1">
-          <span className="text-[11px] font-bold uppercase tracking-widest text-indigo-400">Meal</span>
-          <span className="text-xs text-slate-500">{relativeTime(entry.timestamp)}</span>
+          <span className="text-[11px] font-bold uppercase tracking-widest text-stage">Meal</span>
+          <span className="text-xs text-white/40">{relativeTime(entry.timestamp)}</span>
         </div>
-        <p className="text-sm text-slate-200 font-medium truncate">{entry.description}</p>
+        <p className="text-sm text-white/90 font-medium truncate">{entry.description}</p>
         {(tags.length > 0 || tagsStatus === 'pending' || tagsStatus === 'failed') && (
           <div className="flex flex-wrap gap-1.5 mt-2">
             {tags.map(tag => (
@@ -71,12 +71,12 @@ function MealCard({ entry, onEdit, onDelete }: { entry: MealEntry } & Omit<Props
               </span>
             ))}
             {tagsStatus === 'pending' && tags.length === 0 && (
-              <span className="text-[11px] px-2 py-0.5 rounded-full bg-slate-700/80 text-slate-400 animate-pulse">
+              <span className="text-[11px] px-2 py-0.5 rounded-full bg-white/10 text-white/55 animate-pulse">
                 AI analyzing…
               </span>
             )}
             {tagsStatus === 'failed' && (
-              <span className="text-[11px] px-2 py-0.5 rounded-full bg-red-900/40 text-red-400 max-w-full truncate">
+              <span className="text-[11px] px-2 py-0.5 rounded-full bg-tier-red/15 text-tier-red max-w-full truncate">
                 {entry.tagsError ? `AI: ${entry.tagsError}` : 'AI failed · tap to retry'}
               </span>
             )}
@@ -90,19 +90,19 @@ function MealCard({ entry, onEdit, onDelete }: { entry: MealEntry } & Omit<Props
 function SleepCard({ entry, onEdit, onDelete }: { entry: SleepEntry } & Omit<Props, 'entry'>) {
   const duration = sleepDurationHours(entry.bedtime, entry.wake_time)
   return (
-    <CardShell accentColor="bg-blue-500" onEdit={() => onEdit(entry)} onDelete={() => onDelete(entry.id)} entry={entry}>
+    <CardShell accentColor="bg-moon" onEdit={() => onEdit(entry)} onDelete={() => onDelete(entry.id)} entry={entry}>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1">
-          <span className="text-[11px] font-bold uppercase tracking-widest text-blue-400">Sleep</span>
-          <span className="text-xs text-slate-500">{relativeTime(entry.wake_time)}</span>
+          <span className="text-[11px] font-bold uppercase tracking-widest text-moon">Sleep</span>
+          <span className="text-xs text-white/40">{relativeTime(entry.wake_time)}</span>
         </div>
         <div className="flex items-center gap-3 text-sm">
-          <span className="text-slate-200 font-semibold">{formatDuration(duration)}</span>
+          <span className="text-white/90 font-semibold">{formatDuration(duration)}</span>
           {entry.wakeups > 0 && (
-            <span className="text-slate-500 text-xs">{entry.wakeups} wake-up{entry.wakeups > 1 ? 's' : ''}</span>
+            <span className="text-white/40 text-xs">{entry.wakeups} wake-up{entry.wakeups > 1 ? 's' : ''}</span>
           )}
           {entry.body_battery !== undefined && (
-            <span className="text-emerald-400 text-xs font-medium">⚡ {entry.body_battery}</span>
+            <span className="text-stage text-xs font-medium">⚡ {entry.body_battery}</span>
           )}
         </div>
       </div>
@@ -113,17 +113,17 @@ function SleepCard({ entry, onEdit, onDelete }: { entry: SleepEntry } & Omit<Pro
 function FogCard({ entry, onEdit, onDelete }: { entry: BrainFogEntry } & Omit<Props, 'entry'>) {
   const { bg, text, border } = FOG_COLOR(Math.round(entry.score))
   return (
-    <CardShell accentColor="bg-purple-500" onEdit={() => onEdit(entry)} onDelete={() => onDelete(entry.id)} entry={entry}>
+    <CardShell accentColor="bg-spotlight" onEdit={() => onEdit(entry)} onDelete={() => onDelete(entry.id)} entry={entry}>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1.5">
-          <span className="text-[11px] font-bold uppercase tracking-widest text-purple-400">Brain Fog</span>
-          <span className="text-xs text-slate-500">{relativeTime(entry.timestamp)}</span>
+          <span className="text-[11px] font-bold uppercase tracking-widest text-spotlight">Brain Fog</span>
+          <span className="text-xs text-white/40">{relativeTime(entry.timestamp)}</span>
         </div>
         <div className="flex items-center gap-3">
           <span className={`text-xs font-bold px-2.5 py-1 rounded-full border ${bg} ${text} ${border}`}>
             {entry.score}/10
           </span>
-          {entry.note && <p className="text-slate-400 text-xs truncate">{entry.note}</p>}
+          {entry.note && <p className="text-white/55 text-xs truncate">{entry.note}</p>}
         </div>
       </div>
     </CardShell>
@@ -135,13 +135,13 @@ function WaterCard({ entry, onEdit, onDelete }: { entry: WaterEntry } & Omit<Pro
     ? `${(entry.amount_ml / 1000).toFixed(entry.amount_ml % 1000 === 0 ? 0 : 1)} L`
     : `${entry.amount_ml} ml`
   return (
-    <CardShell accentColor="bg-cyan-500" onEdit={() => onEdit(entry)} onDelete={() => onDelete(entry.id)} entry={entry}>
+    <CardShell accentColor="bg-cyan-400" onEdit={() => onEdit(entry)} onDelete={() => onDelete(entry.id)} entry={entry}>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1">
           <span className="text-[11px] font-bold uppercase tracking-widest text-cyan-400">Water</span>
-          <span className="text-xs text-slate-500">{relativeTime(entry.timestamp)}</span>
+          <span className="text-xs text-white/40">{relativeTime(entry.timestamp)}</span>
         </div>
-        <p className="text-sm text-slate-200 font-semibold">💧 {displayAmount}</p>
+        <p className="text-sm text-white/90 font-semibold">💧 {displayAmount}</p>
       </div>
     </CardShell>
   )
